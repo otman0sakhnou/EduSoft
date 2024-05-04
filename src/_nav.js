@@ -7,11 +7,14 @@ import {
   cilCursor,
   cilDescription,
   cilDrop,
+  cilGroup,
   cilNotes,
   cilPencil,
   cilPuzzle,
   cilSpeedometer,
   cilStar,
+  cilUser,
+  cilUserPlus,
 } from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
@@ -23,8 +26,82 @@ const _nav = [
     icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
     badge: {
       color: 'info',
-      text: 'NEW',
+      text: 'Nouveau',
     },
+  },
+  {
+    component: CNavTitle,
+    name: 'TÂCHES',
+  },
+  {
+    component: CNavGroup,
+    name: 'Gestion',
+    to: '/gestion',
+    icon: <CIcon icon={cilCursor} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'Filière',
+        to: '/BackOffice/Filière',
+      },
+      {
+        component: CNavItem,
+        name: 'Modules',
+        to: '/modules',
+      },
+      {
+        component: CNavItem,
+        name: 'Groupes',
+        to: '/groupes',
+      },
+      {
+        component: CNavItem,
+        name: 'Étudiant',
+        to: '/étudiant',
+      },
+    ],
+  },
+  {
+    component: CNavTitle,
+    name: 'Gestion des Absences',
+  },
+  {
+    component: CNavGroup,
+    name: 'Gestion des Absences',
+    icon: <CIcon icon={cilBell} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'Examiner les Absences',
+        to: '/examiner-absences',
+      },
+      {
+        component: CNavItem,
+        name: 'Signaler une Absence',
+        to: '/signaler-absence',
+      },
+    ],
+  },
+  {
+    component: CNavTitle,
+    name: 'Gestion des Factures',
+  },
+  {
+    component: CNavGroup,
+    name: 'Gestion des Factures',
+    icon: <CIcon icon={cilNotes} customClassName="nav-icon" />,
+    items: [
+      {
+        component: CNavItem,
+        name: 'Régler les Factures',
+        to: '/regler-factures',
+      },
+      {
+        component: CNavItem,
+        name: 'Examiner les Factures',
+        to: '/examiner-factures',
+      },
+    ],
   },
   {
     component: CNavTitle,
@@ -265,40 +342,24 @@ const _nav = [
   },
   {
     component: CNavTitle,
-    name: 'Extras',
-  },
-  {
-    component: CNavGroup,
-    name: 'Pages',
-    icon: <CIcon icon={cilStar} customClassName="nav-icon" />,
-    items: [
-      {
-        component: CNavItem,
-        name: 'Login',
-        to: '/login',
-      },
-      {
-        component: CNavItem,
-        name: 'Register',
-        to: '/register',
-      },
-      {
-        component: CNavItem,
-        name: 'Error 404',
-        to: '/404',
-      },
-      {
-        component: CNavItem,
-        name: 'Error 500',
-        to: '/500',
-      },
-    ],
+    name: 'Utilisateurs',
   },
   {
     component: CNavItem,
-    name: 'Docs',
-    href: 'https://coreui.io/react/docs/templates/installation/',
-    icon: <CIcon icon={cilDescription} customClassName="nav-icon" />,
+    name: 'Compte',
+    to: '/login',
+    icon: <CIcon icon={cilUserPlus} customClassName="nav-icon" />,
+    badge: {
+      color: 'info',
+      text: 'Nouveau',
+    },
+  },
+
+  {
+    component: CNavItem,
+    name: 'Tous les utilisateur',
+    to: '/login',
+    icon: <CIcon icon={cilGroup} customClassName="nav-icon" />,
   },
 ]
 
