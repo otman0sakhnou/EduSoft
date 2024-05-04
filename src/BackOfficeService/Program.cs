@@ -15,14 +15,22 @@ builder.Services.AddDbContext<BackOfficeDbContext>(opt =>
 });
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-
+builder.Services.AddCors(options =>
+            {
+              options.AddDefaultPolicy(builder =>
+              {
+                builder.AllowAnyOrigin()
+                         .AllowAnyMethod()
+                         .AllowAnyHeader();
+              });
+            });
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-.AddJwtBearer(options=>
-{ 
+.AddJwtBearer(options =>
+{
   options.Authority = builder.Configuration["IdentityServiceUrl"];
   options.RequireHttpsMetadata = false;
   options.TokenValidationParameters.ValidateAudience = false;
-  options.TokenValidationParameters.NameClaimType ="name";
+  options.TokenValidationParameters.NameClaimType = "name";
 });
 
 
@@ -31,7 +39,7 @@ var app = builder.Build();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
+app.UseCors();
 app.MapControllers();
 
 try

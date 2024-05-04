@@ -12,10 +12,13 @@ public class FilièreController : ControllerBase
 {
   private readonly BackOfficeDbContext _context;
   private readonly IMapper _mapper;
-  public FilièreController(BackOfficeDbContext backOfficeDb, IMapper mapper)
+  private readonly ILogger<FilièreController> _logger;
+
+  public FilièreController(BackOfficeDbContext backOfficeDb, IMapper mapper, ILogger<FilièreController> logger)
   {
     _context = backOfficeDb;
     _mapper = mapper;
+    _logger = logger;
   }
 
   [HttpGet]
@@ -39,7 +42,34 @@ public class FilièreController : ControllerBase
     var filièreDto = _mapper.Map<FilièreDto>(filière);
     return Ok(filièreDto);
   }
+  [HttpGet("byFilièreName/{name}")]
+  public async Task<ActionResult<IEnumerable<FilièreDto>>> GetFilièreByName(string name)
+  {
+    try
+    {
+      _logger.LogInformation("Attempting to fetch Filières by name containing: {Name}", name);
 
+      var filières = await _context.Filières
+          .Where(f => f.NomFilière.ToLower().Contains(name.ToLower()))
+          .ToListAsync();
+
+      if (filières == null || !filières.Any())
+      {
+        _logger.LogWarning("No Filières found with name containing '{Name}'", name);
+        return NotFound();
+      }
+
+      _logger.LogInformation("Filières with name containing '{Name}' found", name);
+
+      var filièreDtos = _mapper.Map<IEnumerable<FilièreDto>>(filières);
+      return Ok(filièreDtos);
+    }
+    catch (Exception ex)
+    {
+      _logger.LogError(ex, "An error occurred while fetching Filières by name containing: {Name}", name);
+      return StatusCode(500, "Internal server error");
+    }
+  }
   [HttpPost]
   public async Task<ActionResult<FilièreDto>> CreateFilière(CreateFilièreDto createFilièreDto)
   {
