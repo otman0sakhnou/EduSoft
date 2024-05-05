@@ -47,20 +47,14 @@ public class FilièreController : ControllerBase
   {
     try
     {
-      _logger.LogInformation("Attempting to fetch Filières by name containing: {Name}", name);
-
       var filières = await _context.Filières
           .Where(f => f.NomFilière.ToLower().Contains(name.ToLower()))
           .ToListAsync();
 
       if (filières == null || !filières.Any())
       {
-        _logger.LogWarning("No Filières found with name containing '{Name}'", name);
         return NotFound();
       }
-
-      _logger.LogInformation("Filières with name containing '{Name}' found", name);
-
       var filièreDtos = _mapper.Map<IEnumerable<FilièreDto>>(filières);
       return Ok(filièreDtos);
     }

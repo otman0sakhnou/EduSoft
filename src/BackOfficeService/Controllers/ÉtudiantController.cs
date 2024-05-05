@@ -17,7 +17,6 @@ public class ÉtudiantController : ControllerBase
     _mapper = mapper;
   }
 
-  // GET: api/Étudiant
   [HttpGet]
   public async Task<ActionResult<IEnumerable<ÉtudiantDto>>> GetÉtudiants()
   {
@@ -37,28 +36,27 @@ public class ÉtudiantController : ControllerBase
 
     return Ok(étudiantDtos);
   }
-   // GET: api/étudiant/Groupe/{groupName}
-        [HttpGet("Groupe/{groupName}")]
-        public async Task<ActionResult<IEnumerable<ÉtudiantDto>>> GetÉtudiantsByGroup(string groupName)
-        {
-            try
-            {
-                var students = await _context.Étudiants
-                    .Include(e => e.Groupe)
-                    .Where(e => e.Groupe.NomGroupe == groupName)
-                    .ToListAsync();
 
-                var studentDtos = _mapper.Map<List<ÉtudiantDto>>(students);
+  [HttpGet("byGroupName/{groupName}")]
+  public async Task<ActionResult<IEnumerable<ÉtudiantDto>>> GetÉtudiantsByGroup(string groupName)
+  {
+    try
+    {
+      var students = await _context.Étudiants
+          .Include(e => e.Groupe)
+          .Where(e => e.Groupe.NomGroupe == groupName)
+          .ToListAsync();
 
-                return Ok(studentDtos);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex);
-            }
-        }
+      var studentDtos = _mapper.Map<List<ÉtudiantDto>>(students);
 
-  // GET: api/Étudiant/5
+      return Ok(studentDtos);
+    }
+    catch (Exception ex)
+    {
+      return StatusCode(500, ex);
+    }
+  }
+
   [HttpGet("{id}")]
   public async Task<ActionResult<ÉtudiantDto>> GetÉtudiant(Guid id)
   {

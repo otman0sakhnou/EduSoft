@@ -38,7 +38,29 @@ public class GroupeController : ControllerBase
 
     return Ok(groupeDtos);
   }
+  [HttpGet("byGroupName/{name}")]
+  public async Task<ActionResult<IEnumerable<GroupeDto>>> GetGroupeByName(string name)
+  {
+    if (string.IsNullOrEmpty(name))
+    {
+      return BadRequest("Group name cannot be empty");
+    }
 
+    var groupes = await _context.Groupes
+        .Include(g => g.Filière)
+        .Where(g => g.NomGroupe.ToLower().Contains(name.ToLower()))
+        .ToListAsync();
+
+    var groupeDtos = groupes.Select(g =>
+    {
+      var groupeDto = _mapper.Map<GroupeDto>(g);
+      groupeDto.NomFilière = g.Filière?.NomFilière;
+      groupeDto.Description = g.Filière?.Description;
+      return groupeDto;
+    }).ToList();
+
+    return Ok(groupeDtos);
+  }
   [HttpGet("{id}")]
   public async Task<ActionResult<GroupeDto>> GetGroupe(Guid id)
   {
@@ -87,7 +109,7 @@ public class GroupeController : ControllerBase
 
     _mapper.Map(updateGroupeDto, groupe);
 
-   
+
     var filiere = await _context.Filières.FindAsync(updateGroupeDto.IdFilière);
     if (filiere == null)
     {
@@ -95,7 +117,7 @@ public class GroupeController : ControllerBase
     }
 
     groupe.IdFilière = filiere.IdFilière;
-    groupe.Filière = filiere; 
+    groupe.Filière = filiere;
 
     await _context.SaveChangesAsync();
 
@@ -114,6 +136,6 @@ public class GroupeController : ControllerBase
     _context.Groupes.Remove(groupe);
     await _context.SaveChangesAsync();
 
-    return Ok(groupe.NomGroupe +" deleted");
+    return Ok(groupe.NomGroupe + " deleted");
   }
 }

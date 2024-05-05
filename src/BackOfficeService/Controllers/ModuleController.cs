@@ -30,7 +30,30 @@ public class ModuleController : ControllerBase
       var moduleDto = _mapper.Map<ModuleDto>(module);
       moduleDto.NomFilière = module.Filière?.NomFilière;
       moduleDto.Description = module.Filière?.Description;
-      Console.WriteLine(moduleDto.Description);
+      return moduleDto;
+    }).ToList();
+
+    return Ok(moduleDtos);
+  }
+
+  [HttpGet("byModuleName/{name}")]
+  public async Task<ActionResult<IEnumerable<ModuleDto>>> GetModulesByName(string name)
+  {
+    if (string.IsNullOrEmpty(name))
+    {
+      return BadRequest("Module name cannot be empty");
+    }
+
+    var modules = await _context.Modules
+        .Include(m => m.Filière)
+        .Where(m => m.NomModule.ToLower().Contains(name.ToLower()))
+        .ToListAsync();
+
+    var moduleDtos = modules.Select(module =>
+    {
+      var moduleDto = _mapper.Map<ModuleDto>(module);
+      moduleDto.NomFilière = module.Filière?.NomFilière;
+      moduleDto.Description = module.Filière?.Description;
       return moduleDto;
     }).ToList();
 
@@ -75,10 +98,10 @@ public class ModuleController : ControllerBase
     }
 
     module.IdFilière = filiere.IdFilière;
-    module.Filière = filiere; 
+    module.Filière = filiere;
     await _context.SaveChangesAsync();
 
-    return Ok(module); 
+    return Ok(module);
   }
 
 
