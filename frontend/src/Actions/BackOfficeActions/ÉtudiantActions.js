@@ -33,6 +33,27 @@ export async function createStudent(student) {
     throw error
   }
 }
+export async function updateStudent(id, updatedStudent) {
+  try {
+    const response = await fetch(`http://localhost:5000/api/étudiant/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updatedStudent),
+    })
+
+    if (!response.ok) {
+      throw new Error("Échec de mise à jour de l'étudiant")
+    }
+
+    const updatedStudentData = await response.json()
+    return updatedStudentData
+  } catch (error) {
+    console.error("Erreur lors de la mise à jour de l'étudiant:", error)
+    throw error
+  }
+}
 
 export async function deleteStudent(id) {
   try {

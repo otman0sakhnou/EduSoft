@@ -343,11 +343,12 @@ const _nav = [
   {
     component: CNavTitle,
     name: 'Utilisateurs',
+    to: '/Utilisateurs',
   },
   {
-    component: CNavItem,
-    name: 'Compte',
-    to: '/login',
+    component: 'a', // Use anchor tag for external link
+    name: 'Register',
+    href: 'http://localhost:5001/Account/Register',
     icon: <CIcon icon={cilUserPlus} customClassName="nav-icon" />,
     badge: {
       color: 'info',
@@ -357,8 +358,8 @@ const _nav = [
 
   {
     component: CNavItem,
-    name: 'Tous les utilisateur',
-    to: '/login',
+    name: 'Tous les utilisateurs',
+    to: '/Utilisateurs/Tous',
     icon: <CIcon icon={cilGroup} customClassName="nav-icon" />,
   },
 ]

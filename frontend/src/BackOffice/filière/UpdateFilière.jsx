@@ -3,10 +3,9 @@ import PropTypes from 'prop-types'
 import TextField from '@mui/material/TextField'
 import Fab from '@mui/material/Fab'
 import EditIcon from '@mui/icons-material/ModeEditOutlineTwoTone'
-import 'react-confirm-alert/src/react-confirm-alert.css'
 import { updateFiliere } from '../../Actions/BackOfficeActions/FilièreActions'
 import { toast } from 'react-hot-toast'
-import { CButton, CModal, CModalHeader, CModalTitle, CModalBody, CModalFooter } from '@coreui/react'
+import { CModal, CModalHeader, CModalTitle, CModalBody, CModalFooter, CButton } from '@coreui/react'
 
 export default function UpdateFiliereDialog({ filière, fetchFilières }) {
   const [open, setOpen] = useState(false)
@@ -39,6 +38,7 @@ export default function UpdateFiliereDialog({ filière, fetchFilières }) {
       setOpen(false)
       await updateFiliere(filière.idFilière, { NomFilière, description })
       fetchFilières()
+      setOpen(false)
       toast.success('Filière mise à jour avec succès')
     } catch (error) {
       console.error('Error updating filiere:', error)
@@ -51,7 +51,7 @@ export default function UpdateFiliereDialog({ filière, fetchFilières }) {
       <Fab
         style={{ backgroundColor: '#0E46A3', color: 'white' }}
         size="small"
-        onClick={() => handleClickOpen(filière.idFilièr)}
+        onClick={handleClickOpen}
       >
         <EditIcon />
       </Fab>
@@ -158,6 +158,6 @@ export default function UpdateFiliereDialog({ filière, fetchFilières }) {
 }
 
 UpdateFiliereDialog.propTypes = {
-  filière: PropTypes.object.isRequired, // Ensure filiere is an object and is required
-  fetchFilières: PropTypes.func.isRequired, // Ensure fetchFilières is a function and is required
+  filière: PropTypes.object.isRequired,
+  fetchFilières: PropTypes.func.isRequired,
 }

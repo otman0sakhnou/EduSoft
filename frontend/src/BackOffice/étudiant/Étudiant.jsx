@@ -23,11 +23,11 @@ import {
 import { getStudents } from '../../Actions/BackOfficeActions/ÉtudiantActions'
 import AddStudent from './AddÉtudiant'
 import { getGroupes } from '../../Actions/BackOfficeActions/GroupeActions'
-import EditIcon from '@mui/icons-material/ModeEditOutlineTwoTone'
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteTwoTone'
 import Fab from '@mui/material/Fab'
 import { deleteStudent } from '../../Actions/BackOfficeActions/ÉtudiantActions'
 import toast from 'react-hot-toast'
+import UpdateÉtudiant from './UpdateÉtudiant'
 
 export default function Étudiant() {
   const [students, setStudents] = useState([])
@@ -82,10 +82,6 @@ export default function Étudiant() {
 
   const handleSelectChange = (e) => {
     setSelectedGroupe(e.target.value)
-  }
-
-  const handleUpdate = (id) => {
-    console.log('Update student with ID:', id)
   }
 
   const handleDelete = async () => {
@@ -156,7 +152,9 @@ export default function Étudiant() {
             </div>
             <div className="col-lg-3 d-flex justify-content-lg-end mt-3 mt-lg-0">
               <CFormSelect onChange={handleSelectChange} value={selectedGroupe}>
-                <option value=""> Sélectionner le groupe</option>
+                <option key={null} value="">
+                  Sélectionner le groupe
+                </option>
                 {groupes.map((groupe) => (
                   <option key={groupe.idGroupe} value={groupe.idGroupe}>
                     {groupe.nomGroupe}
@@ -184,8 +182,8 @@ export default function Étudiant() {
             </CTableRow>
           </CTableHead>
           <CTableBody>
-            {currentItems.map((student, index) => (
-              <CTableRow key={index}>
+            {currentItems.map((student) => (
+              <CTableRow key={student.etudiantId}>
                 <CTableDataCell>{student.nom}</CTableDataCell>
                 <CTableDataCell>{student.prenom}</CTableDataCell>
                 <CTableDataCell>{student.adresse}</CTableDataCell>
@@ -193,13 +191,7 @@ export default function Étudiant() {
                 <CTableDataCell>{student.email}</CTableDataCell>
                 <CTableDataCell>{student.nomGroupe}</CTableDataCell>
                 <CTableDataCell>
-                  <Fab
-                    style={{ backgroundColor: '#0E46A3', color: 'white' }}
-                    size="small"
-                    onClick={() => handleUpdate(student.etudiantId)}
-                  >
-                    <EditIcon />
-                  </Fab>
+                  <UpdateÉtudiant student={student} fetchStudents={fetchStudents} />
                 </CTableDataCell>
                 <CTableDataCell className="ml-1">
                   <Fab

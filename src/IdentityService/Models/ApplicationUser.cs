@@ -10,4 +10,5 @@ namespace IdentityService.Models;
 public class ApplicationUser : IdentityUser
 {
   public string roleName { get; set; }
+  public string FullName { get; internal set; }
 }

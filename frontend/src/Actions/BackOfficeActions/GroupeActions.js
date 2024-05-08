@@ -55,20 +55,6 @@ export async function updateGroupe(id, groupe) {
   }
 }
 
-export async function getByGroupeName(name) {
-  try {
-    const response = await fetch(`http://localhost:5000/api/groupe/byGroupName/${name}`)
-    if (!response.ok) {
-      throw new Error('Échec de récupération des données')
-    }
-    const data = await response.json()
-    return data
-  } catch (error) {
-    console.error('Erreur lors de la récupération des données:', error)
-    throw error
-  }
-}
-
 export async function deleteGroupe(id) {
   try {
     const response = await fetch(`http://localhost:5000/api/groupe/${id}`, {

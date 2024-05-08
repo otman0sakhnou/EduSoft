@@ -20,11 +20,9 @@ import {
   CModalBody,
   CModalFooter,
 } from '@coreui/react'
-import EditIcon from '@mui/icons-material/ModeEditOutlineTwoTone'
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteTwoTone'
 import Fab from '@mui/material/Fab'
 import { getGroupes } from '../../Actions/BackOfficeActions/GroupeActions'
-import { getByGroupeName } from '../../Actions/BackOfficeActions/GroupeActions'
 import { deleteGroupe } from '../../Actions/BackOfficeActions/GroupeActions'
 import AddGroupeDialog from './AddGroupe'
 import toast from 'react-hot-toast'
@@ -40,15 +38,7 @@ export default function Groupe() {
 
   useEffect(() => {
     fetchGroupe()
-  }, [])
-
-  useEffect(() => {
-    if (searchTerm) {
-      searchGroupeByName()
-    } else {
-      fetchGroupe()
-    }
-  }, [searchTerm, currentPage])
+  })
 
   const fetchGroupe = async () => {
     try {
@@ -58,17 +48,6 @@ export default function Groupe() {
       console.error('Error fetching data:', error)
     }
   }
-
-  const searchGroupeByName = async () => {
-    try {
-      const data = await getByGroupeName(searchTerm)
-      setGroupes(data)
-    } catch (error) {
-      console.error('Error fetching data:', error)
-      setGroupes([])
-    }
-  }
-
   const handleDelete = async (id) => {
     try {
       if (!id) {
@@ -99,12 +78,14 @@ export default function Groupe() {
     setVisible(false)
   }
 
+  const filterGroupes = groupes.filter((groupe) => {
+    return groupe.nomGroupe.toLowerCase().includes(searchTerm.toLowerCase())
+  })
   const indexOfLastItem = currentPage * itemsPerPage
   const indexOfFirstItem = indexOfLastItem - itemsPerPage
-  const currentItems = groupes.slice(indexOfFirstItem, indexOfLastItem)
-  const hasNextPage = currentPage < Math.ceil(groupes.length / itemsPerPage)
+  const currentItems = filterGroupes.slice(indexOfFirstItem, indexOfLastItem)
+  const hasNextPage = currentPage < Math.ceil(filterGroupes.length / itemsPerPage)
   const hasPreviousPage = currentPage > 1
-  const paginate = (pageNumber) => setCurrentPage(pageNumber)
 
   return (
     <>

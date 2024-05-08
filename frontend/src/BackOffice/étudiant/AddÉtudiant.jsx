@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { CButton, CModal, CModalHeader, CModalTitle, CModalBody, CModalFooter } from '@coreui/react'
+import {
+  CButton,
+  CModal,
+  CModalHeader,
+  CModalTitle,
+  CModalBody,
+  CModalFooter,
+  CFormSelect,
+} from '@coreui/react'
 import { TextField, MenuItem, Select, Fab } from '@mui/material/'
 import AddIcon from '@mui/icons-material/Add'
 import { getGroupes } from '../../Actions/BackOfficeActions/GroupeActions'
@@ -74,12 +82,16 @@ export default function AddÉtudiant({ fetchStudents }) {
 
     try {
       setOpen(false)
-      const confirmed = await showConfirmationDialog()
-      if (confirmed) {
-        await createStudent({ nom, prenom, adresse, telephone, email, groupeId })
-        await fetchStudents()
-        toast.success('Étudiant ajouté avec succès')
-      }
+      await createStudent({
+        nom: nom,
+        prenom: prenom,
+        adresse: adresse,
+        telephone: téléphone,
+        email: email,
+        idGroupe: groupeId,
+      })
+      await fetchStudents()
+      toast.success('Étudiant ajouté avec succès')
     } catch (error) {
       console.error('Error creating student:', error)
       toast.error("Erreur lors de l'ajout de l'étudiant")
@@ -186,7 +198,6 @@ export default function AddÉtudiant({ fetchStudents }) {
               <Select
                 value={groupeId}
                 onChange={(e) => {
-                  console.log('Selected groupeId:', e.target.value)
                   setGroupeId(e.target.value)
                   setGroupeNameError(false)
                 }}
@@ -201,7 +212,7 @@ export default function AddÉtudiant({ fetchStudents }) {
                   Sélectionner le groupe
                 </MenuItem>
                 {groupes.map((groupe) => (
-                  <MenuItem key={groupe.IdGroupe} value={groupe.IdGroupe}>
+                  <MenuItem key={groupe.groupeID} value={groupe.groupeID}>
                     {groupe.nomGroupe}
                   </MenuItem>
                 ))}
@@ -213,17 +224,15 @@ export default function AddÉtudiant({ fetchStudents }) {
           <CButton
             type="submit"
             onClick={handleSaveStudent}
-            variant="outline"
-            color="primary"
             style={{
               marginTop: '10px',
               padding: '10px 20px',
               fontSize: '16px',
               fontWeight: 'bold',
-              borderRadius: '5px',
+              borderRadius: '10px',
               border: '2px solid #007bff',
-              color: '#007bff',
-              backgroundColor: 'transparent',
+              color: '#ffffff',
+              backgroundColor: '#007bff',
               cursor: 'pointer',
             }}
           >
@@ -238,7 +247,7 @@ export default function AddÉtudiant({ fetchStudents }) {
               padding: '10px 20px',
               fontSize: '16px',
               fontWeight: 'bold',
-              borderRadius: '5px',
+              borderRadius: '10px',
               border: '2px solid #dc3545',
               color: '#dc3545',
               backgroundColor: 'transparent',

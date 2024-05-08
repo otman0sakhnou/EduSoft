@@ -46,6 +46,7 @@ namespace IdentityService.Pages.Register
                     UserName = Input.Username,
                     Email = Input.Email,
                     roleName=Input.rôle,
+                    FullName = Input.FullName,
                     EmailConfirmed = true 
                 };
 
@@ -57,8 +58,7 @@ namespace IdentityService.Pages.Register
                     {
                         new Claim(JwtClaimTypes.Name, Input.FullName)
                     });
-
-                    // Additional code to assign the selected role to the user
+                    
                     if (!string.IsNullOrEmpty(Input.rôle))
                     {
                         await _userManager.AddToRoleAsync(user, Input.rôle);

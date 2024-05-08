@@ -19,6 +19,7 @@ namespace IdentityService
             // Configure DbContext
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+            builder.Services.AddControllers();
 
             // Configure Identity
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
@@ -28,7 +29,6 @@ namespace IdentityService
             })
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
-
             // Configure IdentityServer
             builder.Services.AddIdentityServer(options =>
             {
@@ -43,7 +43,16 @@ namespace IdentityService
             .AddInMemoryClients(Config.Clients)
             .AddAspNetIdentity<ApplicationUser>()
             .AddProfileService<CustomProfileService>();
-
+            builder.Services.AddScoped<UserController>();
+            builder.Services.AddCors(options =>
+             {
+                 options.AddPolicy("AllowAnyOrigin", builder =>
+                 {
+                     builder.AllowAnyOrigin()
+                            .AllowAnyMethod()
+                            .AllowAnyHeader();
+                 });
+             });
             // Configure cookies
             builder.Services.ConfigureApplicationCookie(option =>
             {
@@ -66,10 +75,11 @@ namespace IdentityService
             }
 
             app.UseStaticFiles();
+            app.UseCors("AllowAnyOrigin");
             app.UseRouting();
             app.UseIdentityServer();
             app.UseAuthorization();
-
+            app.MapControllers();
             app.MapRazorPages()
                 .RequireAuthorization();
 

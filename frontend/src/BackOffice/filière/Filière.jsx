@@ -20,15 +20,11 @@ import {
   CModalBody,
   CModalFooter,
 } from '@coreui/react'
-import EditIcon from '@mui/icons-material/ModeEditOutlineTwoTone'
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteTwoTone'
 import Fab from '@mui/material/Fab'
-import { getFilières } from '../../Actions/BackOfficeActions/FilièreActions'
-import { getFilièreByName } from '../../Actions/BackOfficeActions/FilièreActions'
-import { deleteFilière } from '../../Actions/BackOfficeActions/FilièreActions'
+import { getFilières, deleteFilière } from '../../Actions/BackOfficeActions/FilièreActions'
 import AddFiliereDialog from './AddFilière'
 import toast from 'react-hot-toast'
-import 'react-confirm-alert/src/react-confirm-alert.css'
 import UpdateFiliereDialog from './UpdateFilière'
 
 export default function Filière() {
@@ -38,17 +34,10 @@ export default function Filière() {
   const [searchTerm, setSearchTerm] = useState('')
   const [visible, setVisible] = useState(false)
   const [filièreID, setFilièreId] = useState(null)
+
   useEffect(() => {
     fetchFilières()
   }, [])
-
-  useEffect(() => {
-    if (searchTerm) {
-      searchFilièreByName()
-    } else {
-      fetchFilières()
-    }
-  }, [searchTerm])
 
   const fetchFilières = async () => {
     try {
@@ -59,15 +48,10 @@ export default function Filière() {
     }
   }
 
-  const searchFilièreByName = async () => {
-    try {
-      const data = await getFilièreByName(searchTerm)
-      setFilières(data)
-    } catch (error) {
-      console.error('Error fetching data:', error)
-      setFilières([])
-    }
-  }
+  const filterFilières = filières.filter((f) => {
+    return f.nomFilière.toLowerCase().includes(searchTerm.toLowerCase())
+  })
+
   const handleDelete = async (id) => {
     try {
       if (!id) {
@@ -80,13 +64,15 @@ export default function Filière() {
       console.error('Error showing confirmation dialog:', error)
     }
   }
+
   const deleteConfirmed = async () => {
     try {
       const success = await deleteFilière(filièreID)
       if (success) {
-        fetchFilières()
+        const updatedFilières = filières.filter((f) => f.idFilière !== filièreID)
+        setFilières(updatedFilières)
         toast.success('Filière supprimée avec succès')
-        if (currentItems.length === 1 && currentPage > 1) {
+        if (updatedFilières.length === 0 && currentPage > 1) {
           setCurrentPage(currentPage - 1)
         }
       }
@@ -99,10 +85,9 @@ export default function Filière() {
 
   const indexOfLastItem = currentPage * itemsPerPage
   const indexOfFirstItem = indexOfLastItem - itemsPerPage
-  const currentItems = filières.slice(indexOfFirstItem, indexOfLastItem)
-  const hasNextPage = currentPage < Math.ceil(filières.length / itemsPerPage)
+  const currentItems = filterFilières.slice(indexOfFirstItem, indexOfLastItem)
+  const hasNextPage = currentPage < Math.ceil(filterFilières.length / itemsPerPage)
   const hasPreviousPage = currentPage > 1
-  const paginate = (pageNumber) => setCurrentPage(pageNumber)
 
   return (
     <>
@@ -139,8 +124,8 @@ export default function Filière() {
                 </CTableRow>
               </CTableHead>
               <CTableBody hover>
-                {currentItems.map((filière, index) => (
-                  <CTableRow key={index}>
+                {currentItems.map((filière) => (
+                  <CTableRow key={filière.idFilière}>
                     <CTableDataCell>{filière.nomFilière}</CTableDataCell>
                     <CTableDataCell>{filière.description}</CTableDataCell>
                     <CTableDataCell>
@@ -168,15 +153,18 @@ export default function Filière() {
                 >
                   <span aria-hidden="true">&laquo;</span>
                 </CPaginationItem>
-                {Array.from({ length: Math.ceil(filières.length / itemsPerPage) }, (_, index) => (
-                  <CPaginationItem
-                    key={index}
-                    active={index + 1 === currentPage}
-                    onClick={() => setCurrentPage(index + 1)}
-                  >
-                    {index + 1}
-                  </CPaginationItem>
-                ))}
+                {Array.from(
+                  { length: Math.ceil(filterFilières.length / itemsPerPage) },
+                  (_, index) => (
+                    <CPaginationItem
+                      key={index}
+                      active={index + 1 === currentPage}
+                      onClick={() => setCurrentPage(index + 1)}
+                    >
+                      {index + 1}
+                    </CPaginationItem>
+                  ),
+                )}
                 <CPaginationItem
                   aria-label="Next"
                   onClick={() => setCurrentPage(currentPage + 1)}

@@ -53,19 +53,7 @@ export async function updateFiliere(id, filiere) {
     throw error
   }
 }
-export async function getFilièreByName(name) {
-  try {
-    const response = await fetch(`http://localhost:5000/api/filière/byFilièreName/${name}`)
-    if (!response.ok) {
-      throw new Error('Failed to fetch data')
-    }
-    const data = await response.json()
-    return data
-  } catch (error) {
-    console.error('Error fetching data:', error)
-    throw error
-  }
-}
+
 export async function deleteFilière(id) {
   try {
     const response = await fetch(`http://localhost:5000/api/filière/${id}`, {

@@ -4,6 +4,7 @@ const Filière = React.lazy(() => import('./BackOffice/filière/Filière'))
 const Module = React.lazy(() => import('./BackOffice/module/Module'))
 const Groupe = React.lazy(() => import('./BackOffice/groupe/Groupe'))
 const Étudiant = React.lazy(() => import('./BackOffice/étudiant/Étudiant'))
+const User = React.lazy(() => import('./BackOffice/User'))
 
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 const Colors = React.lazy(() => import('./views/theme/colors/Colors'))
@@ -61,6 +62,14 @@ const routes = [
   { path: '/gestion/Modules', name: 'Modules', element: Module },
   { path: '/gestion/Groupes', name: 'Groupes', element: Groupe },
   { path: '/gestion/Etudiants', name: 'Etudiants', element: Étudiant },
+  { path: '/Utilisateurs', name: 'Utilisateurs', element: Cards, exact: true },
+  { path: '/Utilisateurs/Tous', name: 'Tous les utilisateurs', element: User },
+  {
+    path: '/Utilisateurs/register',
+    name: 'Register',
+    external: true,
+    href: 'http://localhost:5001/Account/Register',
+  },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard },
   { path: '/theme', name: 'Theme', element: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', element: Colors },

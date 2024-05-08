@@ -42,28 +42,6 @@ public class FilièreController : ControllerBase
     var filièreDto = _mapper.Map<FilièreDto>(filière);
     return Ok(filièreDto);
   }
-  [HttpGet("byFilièreName/{name}")]
-  public async Task<ActionResult<IEnumerable<FilièreDto>>> GetFilièreByName(string name)
-  {
-    try
-    {
-      var filières = await _context.Filières
-          .Where(f => f.NomFilière.ToLower().Contains(name.ToLower()))
-          .ToListAsync();
-
-      if (filières == null || !filières.Any())
-      {
-        return NotFound();
-      }
-      var filièreDtos = _mapper.Map<IEnumerable<FilièreDto>>(filières);
-      return Ok(filièreDtos);
-    }
-    catch (Exception ex)
-    {
-      _logger.LogError(ex, "An error occurred while fetching Filières by name containing: {Name}", name);
-      return StatusCode(500, "Internal server error");
-    }
-  }
   [HttpPost]
   public async Task<ActionResult<FilièreDto>> CreateFilière(CreateFilièreDto createFilièreDto)
   {
@@ -84,11 +62,12 @@ public class FilièreController : ControllerBase
       return NotFound();
     }
 
-    _mapper.Map(updateFilièreDto, filière);
+   _mapper.Map(updateFilièreDto, filière);
 
     await _context.SaveChangesAsync();
 
-    return Ok(filière);
+    var updatedFilièreDto = _mapper.Map<FilièreDto>(filière);
+    return Ok(updatedFilièreDto);
   }
 
   [HttpDelete("{id}")]

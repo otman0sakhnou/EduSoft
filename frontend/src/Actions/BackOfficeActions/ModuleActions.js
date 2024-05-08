@@ -33,21 +33,27 @@ export async function createModule(matiere) {
     throw error
   }
 }
-
-export async function getModuleByName(name) {
+export async function updateModule(id, module) {
   try {
-    const response = await fetch(`http://localhost:5000/api/module/byModuleName/${name}`)
+    const response = await fetch(`http://localhost:5000/api/module/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(module),
+    })
+
     if (!response.ok) {
-      throw new Error('Échec de récupération des données')
+      throw new Error(`Failed to update module: ${response.status} ${response.statusText}`)
     }
-    const data = await response.json()
-    return data
+
+    const updatedModule = await response.json()
+    return updatedModule
   } catch (error) {
-    console.error('Erreur lors de la récupération des données:', error)
+    console.error('Error updating module:', error)
     throw error
   }
 }
-
 export async function deleteModule(id) {
   try {
     const response = await fetch(`http://localhost:5000/api/module/${id}`, {

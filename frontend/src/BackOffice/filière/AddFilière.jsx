@@ -15,7 +15,6 @@ export default function AddFiliereDialog({ fetchFilières }) {
   const [description, setDescription] = useState('')
   const [nomFiliereError, setNomFiliereError] = useState(false)
   const [descriptionError, setDescriptionError] = useState(false)
-  const [visible, setVisible] = useState(false)
 
   const handleClickOpen = () => {
     setOpen(true)
@@ -31,7 +30,7 @@ export default function AddFiliereDialog({ fetchFilières }) {
       setNomFiliereError(true)
       hasError = true
     }
-    if (!description || !/^[A-Za-z\s]+$/.test(description)) {
+    if (!description) {
       setDescriptionError(true)
       hasError = true
     }

@@ -19,14 +19,13 @@ import {
   CModalBody,
   CModalFooter,
 } from '@coreui/react'
-import EditIcon from '@mui/icons-material/ModeEditOutlineTwoTone'
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteTwoTone'
 import Fab from '@mui/material/Fab'
 import { getModules } from '../../Actions/BackOfficeActions/ModuleActions'
-import { getModuleByName } from '../../Actions/BackOfficeActions/ModuleActions'
 import { deleteModule } from '../../Actions/BackOfficeActions/ModuleActions'
 import AddModuleDialog from './AddModule'
 import toast from 'react-hot-toast'
+import UpdateModule from './UpdateModule'
 
 export default function Module() {
   const [modules, setModules] = useState([])
@@ -40,30 +39,12 @@ export default function Module() {
     fetchModules()
   }, [])
 
-  useEffect(() => {
-    if (searchTerm) {
-      searchModuleByName()
-    } else {
-      fetchModules()
-    }
-  }, [searchTerm])
-
   const fetchModules = async () => {
     try {
       const data = await getModules()
       setModules(data)
     } catch (error) {
       console.error('Error fetching data:', error)
-    }
-  }
-
-  const searchModuleByName = async () => {
-    try {
-      const data = await getModuleByName(searchTerm)
-      setModules(data)
-    } catch (error) {
-      console.error('Error fetching data:', error)
-      setModules([])
     }
   }
 
@@ -81,7 +62,7 @@ export default function Module() {
           setCurrentPage(currentPage - 1)
         }
       }
-      setDeleteId(null)
+      setDeleteId(deleteId)
     } catch (error) {
       console.error('Error deleting Module:', error)
       toast.error('Échec de la suppression de Module')
@@ -89,11 +70,14 @@ export default function Module() {
       setVisible(false)
     }
   }
+  const filteredModules = modules.filter((module) =>
+    module.nomModule.toLowerCase().includes(searchTerm.toLowerCase()),
+  )
 
   const indexOfLastItem = currentPage * itemsPerPage
   const indexOfFirstItem = indexOfLastItem - itemsPerPage
-  const currentItems = modules.slice(indexOfFirstItem, indexOfLastItem)
-  const hasNextPage = currentPage < Math.ceil(modules.length / itemsPerPage)
+  const currentItems = filteredModules.slice(indexOfFirstItem, indexOfLastItem)
+  const hasNextPage = currentPage < Math.ceil(filteredModules.length / itemsPerPage)
   const hasPreviousPage = currentPage > 1
 
   const handleOpenModal = (id) => {
@@ -136,19 +120,13 @@ export default function Module() {
               </CTableRow>
             </CTableHead>
             <CTableBody hover>
-              {currentItems.map((module, index) => (
-                <CTableRow key={index}>
+              {currentItems.map((module) => (
+                <CTableRow key={module.moduleId}>
                   <CTableDataCell>{module.nomModule}</CTableDataCell>
                   <CTableDataCell>{module.nomFilière}</CTableDataCell>
                   <CTableDataCell>{module.description}</CTableDataCell>
                   <CTableDataCell>
-                    <Fab
-                      style={{ backgroundColor: '#0E46A3', color: 'white' }}
-                      size="small"
-                      onClick={() => handleUpdate(filière.idFilièr)}
-                    >
-                      <EditIcon />
-                    </Fab>
+                    <UpdateModule module={module} fetchModules={fetchModules} />
                   </CTableDataCell>
                   <CTableDataCell>
                     <Fab
@@ -172,15 +150,18 @@ export default function Module() {
               >
                 <span aria-hidden="true">&laquo;</span>
               </CPaginationItem>
-              {Array.from({ length: Math.ceil(modules.length / itemsPerPage) }, (_, index) => (
-                <CPaginationItem
-                  key={index}
-                  active={index + 1 === currentPage}
-                  onClick={() => setCurrentPage(index + 1)}
-                >
-                  {index + 1}
-                </CPaginationItem>
-              ))}
+              {Array.from(
+                { length: Math.ceil(filteredModules.length / itemsPerPage) },
+                (_, index) => (
+                  <CPaginationItem
+                    key={index}
+                    active={index + 1 === currentPage}
+                    onClick={() => setCurrentPage(index + 1)}
+                  >
+                    {index + 1}
+                  </CPaginationItem>
+                ),
+              )}
               <CPaginationItem
                 aria-label="Next"
                 onClick={() => setCurrentPage(currentPage + 1)}

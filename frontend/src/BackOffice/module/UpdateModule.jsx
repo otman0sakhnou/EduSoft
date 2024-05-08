@@ -5,24 +5,23 @@ import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
 import { Fab } from '@mui/material'
 import EditIcon from '@mui/icons-material/ModeEditOutlineTwoTone'
-import 'react-confirm-alert/src/react-confirm-alert.css'
-import { updateGroupe } from '../../Actions/BackOfficeActions/GroupeActions'
+import { updateModule } from '../../Actions/BackOfficeActions/ModuleActions'
 import { getFilières } from '../../Actions/BackOfficeActions/FilièreActions'
 import { toast } from 'react-hot-toast'
 import { CButton, CModal, CModalHeader, CModalTitle, CModalBody, CModalFooter } from '@coreui/react'
 
-export default function UpdateGroupeDialog({ groupe, fetchGroupes }) {
+export default function UpdateModule({ module, fetchModules }) {
   const [open, setOpen] = useState(false)
-  const [groupeName, setGroupeName] = useState(groupe.nomGroupe)
-  const [filièreId, setFilièreId] = useState(groupe.idFilière)
+  const [moduleName, setModuleName] = useState(module.nomModule)
+  const [filièreId, setFilièreId] = useState(module.idFilière)
   const [filières, setFilières] = useState([])
-  const [groupeNameError, setGroupeNameError] = useState(false)
+  const [moduleNameError, setModuleNameError] = useState(false)
   const [filièreError, setFilièreError] = useState(false)
 
   useEffect(() => {
     fetchFilières()
-    setGroupeName(groupe.nomGroupe)
-  }, [groupe])
+    setModuleName(module.nomModule)
+  }, [module])
 
   const fetchFilières = async () => {
     try {
@@ -41,10 +40,11 @@ export default function UpdateGroupeDialog({ groupe, fetchGroupes }) {
     setOpen(false)
   }
 
-  const handleSaveGroupe = async () => {
+  const handleUpdateModule = async () => {
+    console.log('handleUpdateModule called')
     let hasError = false
-    if (!groupeName) {
-      setGroupeNameError(true)
+    if (!moduleName) {
+      setModuleNameError(true)
       hasError = true
     }
     if (!filièreId) {
@@ -54,12 +54,15 @@ export default function UpdateGroupeDialog({ groupe, fetchGroupes }) {
     if (hasError) return
 
     try {
-      await updateGroupe(groupe.groupeID, { nomGroupe: groupeName, idFilière: filièreId })
-      fetchGroupes()
+      console.log('ID :', filièreId)
+      console.log('ID M:', module.moduleId)
+      console.log('NOM :', moduleName)
+      await updateModule(module.moduleId, { nomModule: moduleName, idFilière: filièreId })
+      fetchModules()
       setOpen(false)
-      toast.success('Groupe mis à jour avec succès')
+      toast.success('Module mis à jour avec succès')
     } catch (error) {
-      console.error('Error updating groupe:', error)
+      console.error('Error updating module:', error)
       toast.error('Erreur lors de la mise à jour')
     }
   }
@@ -75,30 +78,30 @@ export default function UpdateGroupeDialog({ groupe, fetchGroupes }) {
       </Fab>
       <CModal visible={open} onClose={handleClose} aria-labelledby="StaticBackdropExampleLabel">
         <CModalHeader closeButton>
-          <CModalTitle id="StaticBackdropExampleLabel">Modifier le groupe</CModalTitle>
+          <CModalTitle id="StaticBackdropExampleLabel">Modifier le Module</CModalTitle>
         </CModalHeader>
         <CModalBody>
-          <div>Remplissez les détails pour le groupe</div>
+          <div>Remplissez les détails pour le Module</div>
           <div className="grid gap-4 py-4">
             <TextField
               autoFocus
-              error={groupeNameError}
-              helperText={groupeNameError && 'Le nom du groupe est requis'}
+              error={moduleNameError}
+              helperText={moduleNameError && 'Le nom de module est requis'}
               margin="dense"
-              id="groupeNanme"
-              name="groupeName"
-              label="Nom du groupe"
+              id="moduleName"
+              name="moduleName"
+              label="Nom de Module"
               type="text"
               fullWidth
               variant="outlined"
-              value={groupeName}
+              value={moduleName}
               onChange={(e) => {
-                setGroupeName(e.target.value)
-                setGroupeNameError(false)
+                setModuleName(e.target.value)
+                setModuleNameError(false)
               }}
             />
             <Select
-              value={filièreId || ``}
+              value={filièreId || ''}
               onChange={(e) => {
                 setFilièreId(e.target.value)
                 setFilièreError(false)
@@ -124,7 +127,7 @@ export default function UpdateGroupeDialog({ groupe, fetchGroupes }) {
         <CModalFooter>
           <CButton
             type="submit"
-            onClick={handleSaveGroupe}
+            onClick={handleUpdateModule}
             variant="outline"
             color="primary"
             style={{
@@ -161,7 +164,7 @@ export default function UpdateGroupeDialog({ groupe, fetchGroupes }) {
   )
 }
 
-UpdateGroupeDialog.propTypes = {
-  groupe: PropTypes.object.isRequired,
-  fetchGroupes: PropTypes.func.isRequired,
+UpdateModule.propTypes = {
+  module: PropTypes.object.isRequired,
+  fetchModules: PropTypes.func.isRequired,
 }

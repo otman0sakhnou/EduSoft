@@ -126,8 +126,7 @@ public class ÉtudiantController : ControllerBase
         throw;
       }
     }
-    var nomComplet = étudiant.Nom + " " + étudiant.Prenom;
-    return Ok(nomComplet + " updated");
+    return Ok(étudiant);
   }
   // DELETE: api/Étudiant/5
   [HttpDelete("{id}")]
