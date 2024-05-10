@@ -4,22 +4,22 @@ namespace IdentityService;
 
 public static class Config
 {
-    public static IEnumerable<IdentityResource> IdentityResources =>
-        new IdentityResource[]
-        {
+  public static IEnumerable<IdentityResource> IdentityResources =>
+      new IdentityResource[]
+      {
             new IdentityResources.OpenId(),
             new IdentityResources.Profile(),
-        };
+      };
 
-    public static IEnumerable<ApiScope> ApiScopes =>
-        new ApiScope[]
-        {
+  public static IEnumerable<ApiScope> ApiScopes =>
+      new ApiScope[]
+      {
             new ApiScope("edusoftapp","EduSoft app full access")
-        };
+      };
 
-    public static IEnumerable<Client> Clients =>
-        new Client[]
-        {
+  public static IEnumerable<Client> Clients =>
+      new Client[]
+      {
             new Client
           {
             ClientId = "postman",
@@ -42,5 +42,5 @@ public static class Config
             AccessTokenLifetime = 3600*24*30,
             AlwaysIncludeUserClaimsInIdToken =true
           },
-        };
+      };
 }

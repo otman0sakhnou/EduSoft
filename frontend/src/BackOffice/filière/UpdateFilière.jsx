@@ -124,10 +124,10 @@ export default function UpdateFiliereDialog({ filière, fetchFilières }) {
               padding: '10px 20px',
               fontSize: '16px',
               fontWeight: 'bold',
-              borderRadius: '5px',
+              borderRadius: '10px',
               border: '2px solid #007bff',
-              color: '#007bff',
-              backgroundColor: 'transparent',
+              color: '#ffffff',
+              backgroundColor: '#007bff',
               cursor: 'pointer',
             }}
           >

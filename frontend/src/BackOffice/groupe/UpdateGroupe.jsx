@@ -91,6 +91,7 @@ export default function UpdateGroupeDialog({ groupe, fetchGroupes }) {
               type="text"
               fullWidth
               variant="outlined"
+              className="mb-3"
               value={groupeName}
               onChange={(e) => {
                 setGroupeName(e.target.value)
@@ -128,25 +129,28 @@ export default function UpdateGroupeDialog({ groupe, fetchGroupes }) {
             variant="outline"
             color="primary"
             style={{
+              marginTop: '10px',
+              padding: '10px 20px',
               fontSize: '16px',
               fontWeight: 'bold',
-              borderRadius: '5px',
+              borderRadius: '10px',
               border: '2px solid #007bff',
-              color: '#007bff',
-              backgroundColor: 'transparent',
+              color: '#ffffff',
+              backgroundColor: '#007bff',
               cursor: 'pointer',
             }}
           >
-            Enregistrer
+            Modifier
           </CButton>
           <CButton
             onClick={handleClose}
             color="secondary"
             style={{
-              marginLeft: '10px',
+              marginTop: '10px',
+              padding: '10px 20px',
               fontSize: '16px',
               fontWeight: 'bold',
-              borderRadius: '5px',
+              borderRadius: '10px',
               border: '2px solid #dc3545',
               color: '#dc3545',
               backgroundColor: 'transparent',

@@ -68,17 +68,18 @@ const _nav = [
   {
     component: CNavGroup,
     name: 'Gestion des Absences',
+    to: '/gestionAbsence',
     icon: <CIcon icon={cilBell} customClassName="nav-icon" />,
     items: [
       {
         component: CNavItem,
         name: 'Examiner les Absences',
-        to: '/examiner-absences',
+        to: '/gestionAbsence/examiner-absences',
       },
       {
         component: CNavItem,
         name: 'Signaler une Absence',
-        to: '/signaler-absence',
+        to: '/gestionAbsence/signaler-absence',
       },
     ],
   },
@@ -354,6 +355,12 @@ const _nav = [
       color: 'info',
       text: 'Nouveau',
     },
+  },
+  {
+    component: CNavItem,
+    name: 'LoginTest',
+    to: '/LoginTest',
+    icon: <CIcon icon={cilUser} customClassName="nav-icon" />,
   },
 
   {

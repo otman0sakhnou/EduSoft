@@ -36,7 +36,6 @@ namespace IdentityService
                 options.Events.RaiseInformationEvents = true;
                 options.Events.RaiseFailureEvents = true;
                 options.Events.RaiseSuccessEvents = true;
-                options.EmitStaticAudienceClaim = true;
             })
             .AddInMemoryIdentityResources(Config.IdentityResources)
             .AddInMemoryApiScopes(Config.ApiScopes)
@@ -58,8 +57,7 @@ namespace IdentityService
             {
                 option.Cookie.SameSite = SameSiteMode.Lax;
             });
-
-            // Configure external authentication (e.g., Google)
+           
             builder.Services.AddAuthentication();
 
             return builder.Build();

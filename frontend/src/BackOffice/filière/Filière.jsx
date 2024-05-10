@@ -94,7 +94,7 @@ export default function Filière() {
       <CCard>
         <CCardBody>
           <div className="container">
-            <div className="row align-items-center mb-4">
+            <div className="row mb-4 align-items-center">
               <div className="col-lg-3 mb-3">
                 <CCardHeader>
                   <h1 className="text-2xl font-bold mb-2">Les filières disponibles</h1>
@@ -113,14 +113,14 @@ export default function Filière() {
                 <AddFiliereDialog fetchFilières={fetchFilières} />
               </div>
             </div>
-            <CTable striped responsive>
+            <CTable align="middle" className="mb-0 border" striped responsive>
               <CTableCaption>Détails des Filières</CTableCaption>
               <CTableHead color="dark">
                 <CTableRow>
-                  <CTableHeaderCell scope="col">Nom de Filière</CTableHeaderCell>
+                  <CTableHeaderCell>Nom de Filière</CTableHeaderCell>
                   <CTableHeaderCell scope="col">Description du Filière</CTableHeaderCell>
-                  <CTableHeaderCell scope="col"></CTableHeaderCell>
-                  <CTableHeaderCell scope="col"></CTableHeaderCell>
+                  <CTableHeaderCell className="text-center" scope="col"></CTableHeaderCell>
+                  <CTableHeaderCell className="text-center" scope="col"></CTableHeaderCell>
                 </CTableRow>
               </CTableHead>
               <CTableBody hover>
@@ -194,10 +194,10 @@ export default function Filière() {
               padding: '10px 20px',
               fontSize: '16px',
               fontWeight: 'bold',
-              borderRadius: '5px',
+              borderRadius: '10px',
               border: '2px solid #007bff',
-              color: '#007bff',
-              backgroundColor: 'transparent',
+              color: '#ffffff',
+              backgroundColor: '#007bff',
               cursor: 'pointer',
             }}
             onClick={deleteConfirmed}

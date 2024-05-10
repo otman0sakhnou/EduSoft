@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -42,6 +43,7 @@ public class FilièreController : ControllerBase
     var filièreDto = _mapper.Map<FilièreDto>(filière);
     return Ok(filièreDto);
   }
+  
   [HttpPost]
   public async Task<ActionResult<FilièreDto>> CreateFilière(CreateFilièreDto createFilièreDto)
   {

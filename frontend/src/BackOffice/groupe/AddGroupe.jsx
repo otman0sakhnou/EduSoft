@@ -90,6 +90,7 @@ export default function AddGroupeDialog({ fetchGroupe }) {
               label="Nom du groupe"
               type="text"
               fullWidth
+              className="mb-3"
               variant="outlined"
               value={groupeName}
               onChange={(e) => {
@@ -128,12 +129,14 @@ export default function AddGroupeDialog({ fetchGroupe }) {
             variant="outline"
             color="primary"
             style={{
+              marginTop: '10px',
+              padding: '10px 20px',
               fontSize: '16px',
               fontWeight: 'bold',
-              borderRadius: '5px',
+              borderRadius: '10px',
               border: '2px solid #007bff',
-              color: '#007bff',
-              backgroundColor: 'transparent',
+              color: '#ffffff',
+              backgroundColor: '#007bff',
               cursor: 'pointer',
             }}
           >
@@ -143,10 +146,11 @@ export default function AddGroupeDialog({ fetchGroupe }) {
             onClick={handleClose}
             color="secondary"
             style={{
-              marginLeft: '10px',
+              marginTop: '10px',
+              padding: '10px 20px',
               fontSize: '16px',
               fontWeight: 'bold',
-              borderRadius: '5px',
+              borderRadius: '10px',
               border: '2px solid #dc3545',
               color: '#dc3545',
               backgroundColor: 'transparent',

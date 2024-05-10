@@ -76,6 +76,7 @@ export default function AddModuleDialog({ fetchModules }) {
           <CModalTitle id="StaticBackdropExampleLabel">Ajouter un nouveau module</CModalTitle>
         </CModalHeader>
         <CModalBody>
+          <div>Remplissez les détails pour le nouveau module</div>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <TextField
@@ -94,6 +95,7 @@ export default function AddModuleDialog({ fetchModules }) {
                 label="Nom du module"
                 type="text"
                 fullWidth
+                className="mb-3"
                 variant="outlined"
                 value={moduleName}
                 onChange={(e) => {
@@ -130,15 +132,16 @@ export default function AddModuleDialog({ fetchModules }) {
           <CButton
             type="submit"
             onClick={handleSaveModule}
-            variant="outline"
             color="primary"
             style={{
+              marginTop: '10px',
+              padding: '10px 20px',
               fontSize: '16px',
               fontWeight: 'bold',
-              borderRadius: '5px',
+              borderRadius: '10px',
               border: '2px solid #007bff',
-              color: '#007bff',
-              backgroundColor: 'transparent',
+              color: '#ffffff',
+              backgroundColor: '#007bff',
               cursor: 'pointer',
             }}
           >
@@ -148,10 +151,11 @@ export default function AddModuleDialog({ fetchModules }) {
             onClick={handleClose}
             color="secondary"
             style={{
-              marginLeft: '10px',
+              marginTop: '10px',
+              padding: '10px 20px',
               fontSize: '16px',
               fontWeight: 'bold',
-              borderRadius: '5px',
+              borderRadius: '10px',
               border: '2px solid #dc3545',
               color: '#dc3545',
               backgroundColor: 'transparent',

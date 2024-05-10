@@ -108,7 +108,7 @@ export default function Module() {
               <AddModuleDialog fetchModules={fetchModules} />
             </div>
           </div>
-          <CTable striped responsive>
+          <CTable align="middle" className="mb-0 border" striped responsive>
             <CTableCaption>Détails des Modules</CTableCaption>
             <CTableHead color="dark">
               <CTableRow>
@@ -190,9 +190,10 @@ export default function Module() {
               padding: '10px 20px',
               fontSize: '16px',
               fontWeight: 'bold',
-              borderRadius: '5px',
+              borderRadius: '10px',
               border: '2px solid #007bff',
-              color: '#007bff',
+              color: '#ffffff',
+              backgroundColor: '#007bff',
               cursor: 'pointer',
             }}
             onClick={handleDelete}

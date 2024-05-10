@@ -5,7 +5,11 @@ const Module = React.lazy(() => import('./BackOffice/module/Module'))
 const Groupe = React.lazy(() => import('./BackOffice/groupe/Groupe'))
 const Étudiant = React.lazy(() => import('./BackOffice/étudiant/Étudiant'))
 const User = React.lazy(() => import('./BackOffice/User'))
-
+const LoginTest = React.lazy(() => import('./TestAuth/loginComponent'))
+//Absence
+const ReportAbsence = React.lazy(() => import('./BackOffice/absence/ReportAbsence'))
+const Review = React.lazy(() => import('./BackOffice/absence/ReviewAbsence'))
+//
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 const Colors = React.lazy(() => import('./views/theme/colors/Colors'))
 const Typography = React.lazy(() => import('./views/theme/typography/Typography'))
@@ -71,6 +75,18 @@ const routes = [
     href: 'http://localhost:5001/Account/Register',
   },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard },
+  { path: '/LoginTest', name: 'LoginTest', element: LoginTest },
+  { path: '/gestionAbsence', name: 'Gestion des Absences', element: Cards, exact: true },
+  {
+    path: '/gestionAbsence/signaler-absence',
+    name: 'Signaler une Absence',
+    element: ReportAbsence,
+  },
+  {
+    path: '/gestionAbsence/examiner-absences',
+    name: 'Examiner les Absences',
+    element: Review,
+  },
   { path: '/theme', name: 'Theme', element: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', element: Colors },
   { path: '/theme/typography', name: 'Typography', element: Typography },
