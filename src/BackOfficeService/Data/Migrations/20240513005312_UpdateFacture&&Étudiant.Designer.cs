@@ -3,6 +3,7 @@ using System;
 using BackOfficeService;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BackOfficeService.Data.Migrations
 {
     [DbContext(typeof(BackOfficeDbContext))]
-    partial class BackOfficeDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240513005312_UpdateFacture&&Étudiant")]
+    partial class UpdateFactureÉtudiant
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -173,17 +176,11 @@ namespace BackOfficeService.Data.Migrations
                     b.Property<string>("CNE")
                         .HasColumnType("text");
 
-                    b.Property<DateOnly?>("DateDeNaissance")
-                        .HasColumnType("date");
-
                     b.Property<string>("Email")
                         .HasColumnType("text");
 
                     b.Property<Guid>("IdGroupe")
                         .HasColumnType("uuid");
-
-                    b.Property<string>("LieuDeNaissance")
-                        .HasColumnType("text");
 
                     b.Property<string>("Nom")
                         .HasColumnType("text");

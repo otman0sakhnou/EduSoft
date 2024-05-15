@@ -61,7 +61,7 @@ function UserList() {
   }
 
   return (
-    <CCard>
+    <CCard className="shadow-lg">
       <CCardBody>
         <CCardHeader className="d-flex justify-content-between align-items-center mb-4">
           <h1 className="text-2xl font-bold">Gestion des utilisateurs</h1>

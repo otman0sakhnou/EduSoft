@@ -39,19 +39,15 @@ public class FactureController : ControllerBase
     try
     {
       // Calculate total amount based on total sessions and montantParSéance
-      double totalAmount = double.Parse(reqFacture.TotalSéances) * (double)reqFacture.MontantParSéance;
-
-      // Determine the status
-      FactureStatut statut = totalAmount == 0 ? FactureStatut.Annulée : FactureStatut.Payée;
-
+      double totalAmount = double.Parse(reqFacture.TotalHeures) * (double)reqFacture.MontantParHeure;
+    
       var facture = new Facture
       {
         NomProfesseur = reqFacture.NomProfesseur,
         Mois = reqFacture.Mois,
-        MontantParSéance = reqFacture.MontantParSéance,
-        TotalSéances = reqFacture.TotalSéances,
+        MontantParHeure = reqFacture.MontantParHeure,
+        TotalHeures = reqFacture.TotalHeures,
         MontantTotale = totalAmount,
-        Statut = statut
       };
 
       // Add facture to database

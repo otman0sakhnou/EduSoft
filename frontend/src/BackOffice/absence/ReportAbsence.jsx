@@ -13,6 +13,7 @@ import {
   CRow,
   CCol,
   CCardHeader,
+  CButton,
 } from '@coreui/react'
 
 export default function Component() {
@@ -128,23 +129,21 @@ export default function Component() {
             </div>
             <CRow>
               <CCol className="text-end">
-                <button
-                  type="submit"
+                <CButton
                   className="btn"
+                  color="info"
+                  shape="rounded-pill"
                   style={{
                     marginTop: '10px',
-                    padding: '10px 20px',
+                    padding: '10px 30px',
                     fontSize: '16px',
                     fontWeight: 'bold',
-                    borderRadius: '10px',
-                    border: '2px solid #007bff',
                     color: '#ffffff',
-                    backgroundColor: '#007bff',
                     cursor: 'pointer',
                   }}
                 >
                   Signaler
-                </button>
+                </CButton>
               </CCol>
             </CRow>
           </form>

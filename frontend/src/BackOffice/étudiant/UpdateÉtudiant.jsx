@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { CButton, CModal, CModalHeader, CModalTitle, CModalBody, CModalFooter } from '@coreui/react'
 import { TextField, MenuItem, Select, Fab } from '@mui/material/'
-import EditIcon from '@mui/icons-material/ModeEditOutlineTwoTone'
+import EditRoundedIcon from '@mui/icons-material/EditRounded'
 import { updateStudent } from '../../Actions/BackOfficeActions/ÉtudiantActions'
 import { toast } from 'react-hot-toast'
 import { getGroupes } from '../../Actions/BackOfficeActions/GroupeActions'
@@ -23,10 +23,18 @@ export default function UpdateÉtudiant({ student, fetchStudents }) {
   const [adresseError, setAdresseError] = useState('')
   const [téléphoneError, setTéléphoneError] = useState('')
   const [emailError, setEmailError] = useState('')
+  const [cin, setCIN] = useState(student.cin)
+  const [cinError, setCINError] = useState('')
+  const [cne, setCNE] = useState(student.cne)
+  const [cneError, setCNEError] = useState('')
+  const [dateNaissance, setDateNaissance] = useState(student.dateDeNaissance)
+  const [dateNaissanceError, setDateNaissanceError] = useState('')
+  const [lieuNaissance, setLieuNaissance] = useState(student.dateDeNaissance)
+  const [lieuNaissanceError, setLieuNaissanceError] = useState('')
 
   useEffect(() => {
     fetchGroupe()
-  })
+  }, [])
 
   const fetchGroupe = async () => {
     try {
@@ -46,6 +54,14 @@ export default function UpdateÉtudiant({ student, fetchStudents }) {
 
   const handleUpdateStudent = async () => {
     let hasError = false
+    if (!cne) {
+      setCNEError(true)
+      hasError = true
+    }
+    if (!cin) {
+      setCINError(true)
+      hasError = true
+    }
     if (!nom) {
       setNomError(true)
       hasError = true
@@ -66,19 +82,34 @@ export default function UpdateÉtudiant({ student, fetchStudents }) {
       setTéléphoneError(true)
       hasError = true
     }
+    if (!dateNaissance) {
+      setDateNaissanceError(true)
+      hasError = true
+    }
+    if (!lieuNaissance) {
+      setLieuNaissanceError(true)
+      hasError = true
+    }
     if (!IdGroupe) {
       setGroupeError(true)
       hasError = true
     }
     if (hasError) return
+    const formattedDateNaissance = dateNaissance
+      ? new Date(dateNaissance).toISOString().split('T')[0]
+      : null
     try {
       await updateStudent(student.etudiantId, {
+        cne: cne,
+        cin: cin,
         nom: nom,
         prenom: prenom,
         adresse: adresse,
         telephone: téléphone,
         email: email,
-        IdGroupe: IdGroupe,
+        dateDeNaissance: formattedDateNaissance,
+        lieuDeNaissance: lieuNaissance,
+        idGroupe: IdGroupe,
       })
       fetchStudents()
       setOpen(false)
@@ -91,9 +122,8 @@ export default function UpdateÉtudiant({ student, fetchStudents }) {
 
   return (
     <>
-      <Fab size="small" color="primary" onClick={handleOpen}>
-        <EditIcon />
-      </Fab>
+      <EditRoundedIcon color="primary" onClick={handleOpen} />
+
       <CModal visible={open} onClose={handleClose} aria-labelledby="staticBackdropLabel">
         <CModalHeader closeButton>
           <CModalTitle id="staticBackdropLabel">Modifier l'étudiant</CModalTitle>
@@ -101,9 +131,41 @@ export default function UpdateÉtudiant({ student, fetchStudents }) {
         <CModalBody>
           <div className="grid gap-4 py-4">
             <TextField
+              autoFocus
+              error={cinError}
+              helperText={cinError && 'Le CIN est requis'}
+              margin="dense"
+              id="cin"
+              name="cin"
+              label="CIN"
+              type="text"
+              fullWidth
+              variant="outlined"
+              value={cin}
+              onChange={(e) => {
+                setCIN(e.target.value)
+                setCINError(false)
+              }}
+            />
+            <TextField
+              error={cneError}
+              helperText={cneError && 'Le CNE est requis'}
+              margin="dense"
+              id="cne"
+              name="cne"
+              label="CNE"
+              type="text"
+              fullWidth
+              variant="outlined"
+              value={cne}
+              onChange={(e) => {
+                setCNE(e.target.value)
+                setCNEError(false)
+              }}
+            />
+            <TextField
               error={nomError}
               helperText={nomError && 'Le nom de groupe est requis'}
-              autoFocus
               margin="dense"
               id="nom"
               name="nom"
@@ -131,6 +193,40 @@ export default function UpdateÉtudiant({ student, fetchStudents }) {
               onChange={(e) => {
                 setPrenom(e.target.value)
                 setPrenomError(false)
+              }}
+            />
+            <TextField
+              error={dateNaissanceError}
+              helperText={dateNaissanceError && 'La date de naissance est requise'}
+              margin="dense"
+              id="dateNaissance"
+              name="dateNaissance"
+              label="Date de Naissance"
+              type="date"
+              fullWidth
+              variant="outlined"
+              value={dateNaissance}
+              onChange={(e) => {
+                setDateNaissance(e.target.value)
+                setDateNaissanceError(false)
+              }}
+              InputLabelProps={{ shrink: true }}
+              InputProps={{ placeholder: '' }}
+            />
+            <TextField
+              error={lieuNaissanceError}
+              helperText={lieuNaissanceError && 'Le lieu de naissance est requisssssssssssss'}
+              margin="dense"
+              id="lieuNaissance"
+              name="lieuNaissance"
+              label="Lieu de Naissance"
+              type="text"
+              fullWidth
+              variant="outlined"
+              value={lieuNaissance}
+              onChange={(e) => {
+                setLieuNaissance(e.target.value)
+                setLieuNaissanceError(false)
               }}
             />
             <TextField
@@ -209,13 +305,12 @@ export default function UpdateÉtudiant({ student, fetchStudents }) {
           <CButton
             type="submit"
             onClick={handleUpdateStudent}
+            shape="rounded-pill"
             style={{
               marginTop: '10px',
-              padding: '10px 20px',
+              padding: '10px 30px',
               fontSize: '16px',
               fontWeight: 'bold',
-              borderRadius: '10px',
-              border: '2px solid #007bff',
               color: '#ffffff',
               backgroundColor: '#007bff',
               cursor: 'pointer',
@@ -225,17 +320,15 @@ export default function UpdateÉtudiant({ student, fetchStudents }) {
           </CButton>
           <CButton
             onClick={handleClose}
-            color="secondary"
+            shape="rounded-pill"
             style={{
               marginTop: '10px',
               marginLeft: '10px',
               padding: '10px 20px',
               fontSize: '16px',
               fontWeight: 'bold',
-              borderRadius: '10px',
               border: '2px solid #dc3545',
               color: '#dc3545',
-              backgroundColor: 'transparent',
               cursor: 'pointer',
             }}
           >

@@ -27,6 +27,8 @@ import { deleteGroupe } from '../../Actions/BackOfficeActions/GroupeActions'
 import AddGroupeDialog from './AddGroupe'
 import toast from 'react-hot-toast'
 import UpdateGroupeDialog from './UpdateGroupe'
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
+import { Link } from 'react-router-dom'
 
 export default function Groupe() {
   const [groupes, setGroupes] = useState([])
@@ -38,8 +40,8 @@ export default function Groupe() {
 
   useEffect(() => {
     fetchGroupe()
-  })
-
+  }, [])
+  //get all groupes
   const fetchGroupe = async () => {
     try {
       const data = await getGroupes()
@@ -48,6 +50,7 @@ export default function Groupe() {
       console.error('Error fetching data:', error)
     }
   }
+
   const handleDelete = async (id) => {
     try {
       if (!id) {
@@ -89,7 +92,7 @@ export default function Groupe() {
 
   return (
     <>
-      <CCard>
+      <CCard className="shadow-lg">
         <CCardBody>
           <div className="container">
             <div className="row mb-4 align-items-center">
@@ -119,7 +122,6 @@ export default function Groupe() {
                   <CTableHeaderCell scope="col">Nom du Filière</CTableHeaderCell>
                   <CTableHeaderCell scope="col">Description du Filière</CTableHeaderCell>
                   <CTableHeaderCell scope="col"></CTableHeaderCell>
-                  <CTableHeaderCell scope="col"></CTableHeaderCell>
                 </CTableRow>
               </CTableHead>
               <CTableBody hover>
@@ -129,13 +131,24 @@ export default function Groupe() {
                     <CTableDataCell>{groupe.nomFilière}</CTableDataCell>
                     <CTableDataCell>{groupe.description}</CTableDataCell>
                     <CTableDataCell>
-                      <UpdateGroupeDialog groupe={groupe} fetchGroupes={fetchGroupe} />
-                    </CTableDataCell>
-                    <CTableDataCell>
+                      <Fab
+                        style={{ backgroundColor: '#007bff', color: 'white' }}
+                        size="small"
+                        className="mx-3"
+                      >
+                        <Link
+                          to={`/étudiant/ÉtudiantParGroupe/${groupe.nomGroupe}`}
+                          style={{ color: 'inherit', textDecoration: 'none' }}
+                        >
+                          <RemoveRedEyeIcon />
+                        </Link>
+                      </Fab>
+                      <UpdateGroupeDialog groupe={groupe} fetchGroupe={fetchGroupe} />
                       <Fab
                         style={{ backgroundColor: '#C40C0C', color: 'white' }}
                         size="small"
                         onClick={() => handleDelete(groupe.groupeID)}
+                        className="mx-3"
                       >
                         <DeleteOutlinedIcon />
                       </Fab>

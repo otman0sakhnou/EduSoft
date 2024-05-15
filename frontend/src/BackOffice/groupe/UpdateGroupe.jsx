@@ -11,7 +11,7 @@ import { getFilières } from '../../Actions/BackOfficeActions/FilièreActions'
 import { toast } from 'react-hot-toast'
 import { CButton, CModal, CModalHeader, CModalTitle, CModalBody, CModalFooter } from '@coreui/react'
 
-export default function UpdateGroupeDialog({ groupe, fetchGroupes }) {
+export default function UpdateGroupeDialog({ groupe, fetchGroupe }) {
   const [open, setOpen] = useState(false)
   const [groupeName, setGroupeName] = useState(groupe.nomGroupe)
   const [filièreId, setFilièreId] = useState(groupe.idFilière)
@@ -55,7 +55,7 @@ export default function UpdateGroupeDialog({ groupe, fetchGroupes }) {
 
     try {
       await updateGroupe(groupe.groupeID, { nomGroupe: groupeName, idFilière: filièreId })
-      fetchGroupes()
+      fetchGroupe()
       setOpen(false)
       toast.success('Groupe mis à jour avec succès')
     } catch (error) {
@@ -70,6 +70,7 @@ export default function UpdateGroupeDialog({ groupe, fetchGroupes }) {
         style={{ backgroundColor: '#0E46A3', color: 'white' }}
         size="small"
         onClick={handleClickOpen}
+        className="mx-3"
       >
         <EditIcon />
       </Fab>
@@ -167,5 +168,5 @@ export default function UpdateGroupeDialog({ groupe, fetchGroupes }) {
 
 UpdateGroupeDialog.propTypes = {
   groupe: PropTypes.object.isRequired,
-  fetchGroupes: PropTypes.func.isRequired,
+  fetchGroupe: PropTypes.func.isRequired,
 }

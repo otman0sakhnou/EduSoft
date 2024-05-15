@@ -86,7 +86,7 @@ export default function Module() {
   }
 
   return (
-    <CCard>
+    <CCard className="shadow-lg">
       <CCardBody>
         <div className="container">
           <div className="row mb-4 align-items-center">

@@ -69,10 +69,9 @@ export default function Filière() {
     try {
       const success = await deleteFilière(filièreID)
       if (success) {
-        const updatedFilières = filières.filter((f) => f.idFilière !== filièreID)
-        setFilières(updatedFilières)
+        fetchFilières()
         toast.success('Filière supprimée avec succès')
-        if (updatedFilières.length === 0 && currentPage > 1) {
+        if (currentItems.length === 1 && currentPage > 1) {
           setCurrentPage(currentPage - 1)
         }
       }
@@ -91,7 +90,7 @@ export default function Filière() {
 
   return (
     <>
-      <CCard>
+      <CCard className="shadow-lg">
         <CCardBody>
           <div className="container">
             <div className="row mb-4 align-items-center">
@@ -120,7 +119,6 @@ export default function Filière() {
                   <CTableHeaderCell>Nom de Filière</CTableHeaderCell>
                   <CTableHeaderCell scope="col">Description du Filière</CTableHeaderCell>
                   <CTableHeaderCell className="text-center" scope="col"></CTableHeaderCell>
-                  <CTableHeaderCell className="text-center" scope="col"></CTableHeaderCell>
                 </CTableRow>
               </CTableHead>
               <CTableBody hover>
@@ -130,11 +128,10 @@ export default function Filière() {
                     <CTableDataCell>{filière.description}</CTableDataCell>
                     <CTableDataCell>
                       <UpdateFiliereDialog filière={filière} fetchFilières={fetchFilières} />
-                    </CTableDataCell>
-                    <CTableDataCell>
                       <Fab
                         style={{ backgroundColor: '#C40C0C', color: 'white' }}
                         size="small"
+                        className="mx-5"
                         onClick={() => handleDelete(filière.idFilière)}
                       >
                         <DeleteOutlinedIcon />
@@ -153,18 +150,15 @@ export default function Filière() {
                 >
                   <span aria-hidden="true">&laquo;</span>
                 </CPaginationItem>
-                {Array.from(
-                  { length: Math.ceil(filterFilières.length / itemsPerPage) },
-                  (_, index) => (
-                    <CPaginationItem
-                      key={index}
-                      active={index + 1 === currentPage}
-                      onClick={() => setCurrentPage(index + 1)}
-                    >
-                      {index + 1}
-                    </CPaginationItem>
-                  ),
-                )}
+                {Array.from({ length: Math.ceil(filières.length / itemsPerPage) }, (_, index) => (
+                  <CPaginationItem
+                    key={index}
+                    active={index + 1 === currentPage}
+                    onClick={() => setCurrentPage(index + 1)}
+                  >
+                    {index + 1}
+                  </CPaginationItem>
+                ))}
                 <CPaginationItem
                   aria-label="Next"
                   onClick={() => setCurrentPage(currentPage + 1)}

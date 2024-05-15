@@ -18,16 +18,18 @@ public class SéanceController : ControllerBase
     _backOfficeDbContext = backOfficeDbContext;
     _mapper = mapper;
   }
-  [HttpGet("AllSessions")]
+  [HttpGet]
   public async Task<ActionResult<IEnumerable<SéanceDto>>> GetAllSessions()
   {
     try
     {
-      // Retrieve all sessions from the database
       var seances = await _backOfficeDbContext.Séances.ToListAsync();
-
-      // Map the sessions to DTOs
+      
       var séanceDtos = _mapper.Map<List<SéanceDto>>(seances);
+      if (séanceDtos == null || séanceDtos.Count == 0)
+      {
+        return NotFound("Aucune séance n'a été trouvée.");
+      }
 
       return Ok(séanceDtos);
     }
@@ -94,8 +96,8 @@ public class SéanceController : ControllerBase
       return StatusCode(500, ex);
     }
   }
-  [HttpGet("TotalSessionsByProfessor")]
-  public async Task<ActionResult<IEnumerable<SéanceViewModel>>> GetTotalSessionsByProfessor([FromQuery] string nomProfesseur, [FromQuery] DateOnly date)
+  [HttpGet("TotalHoursByProfessor")]
+  public async Task<ActionResult<int>> GetTotalHoursByProfessor([FromQuery] string nomProfesseur, [FromQuery] DateOnly date)
   {
     try
     {
@@ -104,7 +106,7 @@ public class SéanceController : ControllerBase
           .Where(s => s.NomProfesseur == nomProfesseur && s.DateSéance.Year == date.Year && s.DateSéance.Month == date.Month)
           .ToListAsync();
 
-      var totalSessions = 0;
+      int totalHours = 0;
 
       foreach (var seance in seances)
       {
@@ -113,14 +115,7 @@ public class SéanceController : ControllerBase
 
         TimeSpan sessionDuration = heureFin - heureDebut;
 
-        if (sessionDuration.TotalHours >= 3)
-        {
-          totalSessions += 2;
-        }
-        else
-        {
-          totalSessions += 1;
-        }
+        totalHours += sessionDuration.Hours;
       }
 
       var monthName = frenchCulture.DateTimeFormat.GetMonthName(date.Month);
@@ -129,7 +124,7 @@ public class SéanceController : ControllerBase
       {
         NomProfesseur = nomProfesseur,
         Mois = monthName,
-        TotalSéance = totalSessions.ToString()
+        TotalHeures = totalHours.ToString()
       };
 
       return Ok(new List<SéanceViewModel> { séanceViewModel });
@@ -139,6 +134,7 @@ public class SéanceController : ControllerBase
       return StatusCode(500, ex);
     }
   }
+
 
 
 }

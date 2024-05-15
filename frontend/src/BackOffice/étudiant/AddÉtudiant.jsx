@@ -30,6 +30,14 @@ export default function AddÉtudiant({ fetchStudents }) {
   const [groupeId, setGroupeId] = useState(``)
   const [groupes, setGroupes] = useState([])
   const [groupeNameError, setGroupeNameError] = useState(false)
+  const [cin, setCIN] = useState('')
+  const [cinError, setCINError] = useState('')
+  const [cne, setCNE] = useState('')
+  const [cneError, setCNEError] = useState('')
+  const [dateNaissance, setDateNaissance] = useState('')
+  const [dateNaissanceError, setDateNaissanceError] = useState('')
+  const [lieuNaissance, setLieuNaissance] = useState('')
+  const [lieuNaissanceError, setLieuNaissanceError] = useState('')
 
   useEffect(() => {
     fetchGroupes()
@@ -54,6 +62,14 @@ export default function AddÉtudiant({ fetchStudents }) {
 
   const handleSaveStudent = async () => {
     let hasError = false
+    if (!cne) {
+      setCNEError(true)
+      hasError = true
+    }
+    if (!cin) {
+      setCINError(true)
+      hasError = true
+    }
     if (!nom) {
       setNomError(true)
       hasError = true
@@ -74,20 +90,34 @@ export default function AddÉtudiant({ fetchStudents }) {
       setEmailError(true)
       hasError = true
     }
+    if (!dateNaissance) {
+      setDateNaissanceError(true)
+      hasError = true
+    }
+    if (!lieuNaissance) {
+      setLieuNaissanceError(true)
+      hasError = true
+    }
     if (!groupeId) {
       setGroupeNameError(true)
       hasError = true
     }
     if (hasError) return
-
+    const formattedDateNaissance = dateNaissance
+      ? new Date(dateNaissance).toISOString().split('T')[0]
+      : null
     try {
       setOpen(false)
       await createStudent({
+        cne: cne,
+        cin: cin,
         nom: nom,
         prenom: prenom,
         adresse: adresse,
         telephone: téléphone,
         email: email,
+        dateDeNaissance: formattedDateNaissance,
+        lieuDeNaissance: lieuNaissance,
         idGroupe: groupeId,
       })
       await fetchStudents()
@@ -100,9 +130,21 @@ export default function AddÉtudiant({ fetchStudents }) {
 
   return (
     <>
-      <Fab size="medium" color="success" onClick={handleOpen}>
-        <AddIcon />
-      </Fab>
+      <CButton
+        color="success"
+        shape="rounded-pill"
+        onClick={handleOpen}
+        style={{
+          marginTop: '10px',
+          padding: '10px 30px',
+          fontSize: '16px',
+          fontWeight: 'bold',
+          cursor: 'pointer',
+          color: 'white',
+        }}
+      >
+        Ajouter un étudiant
+      </CButton>
       <CModal
         alignment="center"
         visible={open}
@@ -114,9 +156,41 @@ export default function AddÉtudiant({ fetchStudents }) {
         </CModalHeader>
         <CModalBody>
           <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
               <TextField
                 autoFocus
+                error={cinError}
+                helperText={cinError && 'Le CIN est requis'}
+                margin="dense"
+                id="cin"
+                name="cin"
+                label="CIN"
+                type="text"
+                fullWidth
+                variant="outlined"
+                value={cin}
+                onChange={(e) => {
+                  setCIN(e.target.value)
+                  setCINError(false)
+                }}
+              />
+              <TextField
+                error={cneError}
+                helperText={cneError && 'Le CNE est requis'}
+                margin="dense"
+                id="cne"
+                name="cne"
+                label="CNE"
+                type="text"
+                fullWidth
+                variant="outlined"
+                value={cne}
+                onChange={(e) => {
+                  setCNE(e.target.value)
+                  setCNEError(false)
+                }}
+              />
+              <TextField
                 error={nomError}
                 helperText={nomError && 'Le nom de groupe est requis'}
                 margin="dense"
@@ -146,6 +220,40 @@ export default function AddÉtudiant({ fetchStudents }) {
                 onChange={(e) => {
                   setPrenom(e.target.value)
                   setPrenomError(false)
+                }}
+              />
+              <TextField
+                error={dateNaissanceError}
+                helperText={dateNaissanceError && 'La date de naissance est requise'}
+                margin="dense"
+                id="dateNaissance"
+                name="dateNaissance"
+                label="Date de Naissance"
+                type="date"
+                fullWidth
+                variant="outlined"
+                value={dateNaissance}
+                onChange={(e) => {
+                  setDateNaissance(e.target.value)
+                  setDateNaissanceError(false)
+                }}
+                InputLabelProps={{ shrink: true }}
+                InputProps={{ placeholder: '' }}
+              />
+              <TextField
+                error={lieuNaissanceError}
+                helperText={lieuNaissanceError && 'Le lieu de naissance est requisssssssssssss'}
+                margin="dense"
+                id="lieuNaissance"
+                name="lieuNaissance"
+                label="Lieu de Naissance"
+                type="text"
+                fullWidth
+                variant="outlined"
+                value={lieuNaissance}
+                onChange={(e) => {
+                  setLieuNaissance(e.target.value)
+                  setLieuNaissanceError(false)
                 }}
               />
               <TextField
@@ -224,13 +332,12 @@ export default function AddÉtudiant({ fetchStudents }) {
           <CButton
             type="submit"
             onClick={handleSaveStudent}
+            shape="rounded-pill"
             style={{
               marginTop: '10px',
-              padding: '10px 20px',
+              padding: '10px 30px',
               fontSize: '16px',
               fontWeight: 'bold',
-              borderRadius: '10px',
-              border: '2px solid #007bff',
               color: '#ffffff',
               backgroundColor: '#007bff',
               cursor: 'pointer',
@@ -240,17 +347,15 @@ export default function AddÉtudiant({ fetchStudents }) {
           </CButton>
           <CButton
             onClick={handleClose}
-            color="secondary"
+            shape="rounded-pill"
             style={{
               marginTop: '10px',
               marginLeft: '10px',
               padding: '10px 20px',
               fontSize: '16px',
               fontWeight: 'bold',
-              borderRadius: '10px',
               border: '2px solid #dc3545',
               color: '#dc3545',
-              backgroundColor: 'transparent',
               cursor: 'pointer',
             }}
           >

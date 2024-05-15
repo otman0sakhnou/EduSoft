@@ -20,7 +20,27 @@ public class AbsenceController : ControllerBase
     _backOfficeDbContext = backOfficeDbContext;
     _mapper = mapper;
   }
-//afficher les absences d'un étudiant par groupe avec et par date 
+  [HttpGet]
+  public async Task<ActionResult<IEnumerable<AbsenceDto>>> GetAllAbsences()
+  {
+    try
+    {
+      var absences = await _backOfficeDbContext.Absences.ToListAsync();
+      var absenceDtos = _mapper.Map<List<AbsenceDto>>(absences);
+
+      if (absenceDtos == null || absenceDtos.Count == 0)
+      {
+        return NotFound("Aucune absence n'a été trouvée.");
+      }
+
+      return Ok(absenceDtos);
+    }
+    catch (Exception ex)
+    {
+      return StatusCode(500, ex);
+    }
+  }
+  //afficher les absences d'un étudiant par groupe avec et par date 
   [HttpGet("groupe/{groupName}")]
   public async Task<ActionResult<IEnumerable<AbsenceDto>>> GetAbsenceHistoryByGroupName(string groupName, [FromQuery] DateOnly? date = null)
   {
@@ -77,7 +97,7 @@ public class AbsenceController : ControllerBase
   }
 
 
-//signaler une Absence
+  //signaler une Absence
   [Authorize]
   [HttpPost]
   public async Task<ActionResult<AbsenceDto>> ReportAbsence(SignaleAbsenceDto request)
@@ -139,5 +159,5 @@ public class AbsenceController : ControllerBase
       return StatusCode(500, ex);
     }
   }
-  
+
 }

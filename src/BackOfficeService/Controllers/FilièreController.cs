@@ -43,7 +43,7 @@ public class FilièreController : ControllerBase
     var filièreDto = _mapper.Map<FilièreDto>(filière);
     return Ok(filièreDto);
   }
-  
+  [Authorize]
   [HttpPost]
   public async Task<ActionResult<FilièreDto>> CreateFilière(CreateFilièreDto createFilièreDto)
   {

@@ -10,11 +10,11 @@ public class ReqFacture
   [Required(ErrorMessage = "Le mois est requis.")]
   public string Mois { get; set; }
 
-  [Required(ErrorMessage = "Le montant par séance est requis.")]
+  [Required(ErrorMessage = "Le montant par heure est requis.")]
   [Range(0.01, double.MaxValue, ErrorMessage = "Le montant par séance doit être supérieur à zéro.")]
-  public decimal MontantParSéance { get; set; }
+  public decimal MontantParHeure { get; set; }
 
-  [Required(ErrorMessage = "Le total des séances est requis.")]
-  public string TotalSéances { get; set; }
+  [Required(ErrorMessage = "Le total des heures est requis.")]
+  public string TotalHeures { get; set; }
 
 }

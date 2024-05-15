@@ -14,11 +14,26 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilContrast, cilMenu, cilMoon, cilSun } from '@coreui/icons'
-
+import { useAuth } from 'react-oidc-context'
 import { AppBreadcrumb } from './index'
 import { AppHeaderDropdown } from './header/index'
 
 const AppHeader = () => {
+  const auth = useAuth()
+  const [userName, setUserName] = useState('')
+
+  useEffect(() => {
+    // Check if user information is available
+    if (auth.user) {
+      setUserName(auth.user.profile.name)
+    } else {
+      // If not available, try to retrieve from storage
+      const storedUser = sessionStorage.getItem('user')
+      if (storedUser) {
+        setUserName(JSON.parse(storedUser).profile.name)
+      }
+    }
+  }, [auth.user])
   const headerRef = useRef()
   const { colorMode, setColorMode } = useColorModes('coreui-free-react-admin-template-theme')
 
@@ -40,8 +55,11 @@ const AppHeader = () => {
         >
           <CIcon icon={cilMenu} size="lg" />
         </CHeaderToggler>
-        <CHeaderNav className="ms-auto">
-          <CNavItem>Bienvenue, User</CNavItem>
+        <CHeaderNav
+          style={{ fontSize: '20px', fontWeight: 'bold', marginRight: '10px' }}
+          className="ms-auto"
+        >
+          <CNavItem>{userName ? `Bienvenue, ${userName}` : 'Bienvenue'}</CNavItem>
         </CHeaderNav>
         <CHeaderNav>
           <li className="nav-item py-1">

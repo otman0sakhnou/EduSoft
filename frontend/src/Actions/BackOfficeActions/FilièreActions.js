@@ -11,12 +11,13 @@ export async function getFilières() {
     throw error
   }
 }
-export async function createFiliere(filiere) {
+export async function createFiliere(filiere, accessToken) {
   try {
     const response = await fetch('http://localhost:5000/api/filière', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
       },
       body: JSON.stringify(filiere),
     })

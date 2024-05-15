@@ -8,6 +8,7 @@ import { Fab } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import { toast } from 'react-hot-toast'
 import { CButton, CModal, CModalHeader, CModalTitle, CModalBody, CModalFooter } from '@coreui/react'
+import { useAuth } from 'react-oidc-context'
 
 export default function AddFiliereDialog({ fetchFilières }) {
   const [open, setOpen] = useState(false)
@@ -15,6 +16,8 @@ export default function AddFiliereDialog({ fetchFilières }) {
   const [description, setDescription] = useState('')
   const [nomFiliereError, setNomFiliereError] = useState(false)
   const [descriptionError, setDescriptionError] = useState(false)
+  const auth = useAuth()
+  const accessToken = auth?.user?.access_token
 
   const handleClickOpen = () => {
     setOpen(true)
@@ -38,7 +41,7 @@ export default function AddFiliereDialog({ fetchFilières }) {
 
     try {
       setOpen(false)
-      await createFiliere({ NomFilière, description })
+      await createFiliere({ NomFilière, description }, accessToken)
       fetchFilières()
       toast.success('Filière ajouté avec succès')
     } catch (error) {
