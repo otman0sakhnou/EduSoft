@@ -6,6 +6,7 @@ import EditIcon from '@mui/icons-material/ModeEditOutlineTwoTone'
 import { updateFiliere } from '../../Actions/BackOfficeActions/FilièreActions'
 import { toast } from 'react-hot-toast'
 import { CModal, CModalHeader, CModalTitle, CModalBody, CModalFooter, CButton } from '@coreui/react'
+import EditRounded from '@mui/icons-material/EditRounded'
 
 export default function UpdateFiliereDialog({ filière, fetchFilières }) {
   const [open, setOpen] = useState(false)
@@ -48,13 +49,12 @@ export default function UpdateFiliereDialog({ filière, fetchFilières }) {
 
   return (
     <>
-      <Fab
-        style={{ backgroundColor: '#0E46A3', color: 'white' }}
-        size="small"
+      <EditRounded
+        sx={{ fontSize: 30 }}
+        className="mx-3"
+        color="primary"
         onClick={handleClickOpen}
-      >
-        <EditIcon />
-      </Fab>
+      />
       <CModal visible={open} onClose={handleClose} aria-labelledby="StaticBackdropExampleLabel">
         <CModalHeader closeButton>
           <CModalTitle id="StaticBackdropExampleLabel">Modifier la filière</CModalTitle>
@@ -117,8 +117,7 @@ export default function UpdateFiliereDialog({ filière, fetchFilières }) {
           <CButton
             type="submit"
             onClick={handleSaveFiliere}
-            variant="outline"
-            color="primary"
+            shape="rounded-pill"
             style={{
               marginTop: '10px',
               padding: '10px 20px',
@@ -135,7 +134,7 @@ export default function UpdateFiliereDialog({ filière, fetchFilières }) {
           </CButton>
           <CButton
             onClick={handleClose}
-            color="secondary"
+            shape="rounded-pill"
             style={{
               marginTop: '10px',
               marginLeft: '10px',

@@ -19,13 +19,15 @@ import {
   CModalBody,
   CModalFooter,
 } from '@coreui/react'
-import DeleteOutlinedIcon from '@mui/icons-material/DeleteTwoTone'
-import Fab from '@mui/material/Fab'
+import SearchIcon from '@mui/icons-material/Search'
+import { InputAdornment, TextField } from '@mui/material'
 import { getModules } from '../../Actions/BackOfficeActions/ModuleActions'
 import { deleteModule } from '../../Actions/BackOfficeActions/ModuleActions'
 import AddModuleDialog from './AddModule'
 import toast from 'react-hot-toast'
 import UpdateModule from './UpdateModule'
+import DeleteRounded from '@mui/icons-material/DeleteRounded'
+import BlurOnRounded from '@mui/icons-material/BlurOnRounded'
 
 export default function Module() {
   const [modules, setModules] = useState([])
@@ -90,33 +92,59 @@ export default function Module() {
       <CCardBody>
         <div className="container">
           <div className="row mb-4 align-items-center">
-            <div className="col-lg-3 mb-3">
+            <div className="col-lg-12 mb-3">
               <CCardHeader>
-                <h1 className="text-2xl font-bold mb-2">Les modules disponibles</h1>
+                <div className="d-flex align-items-center">
+                  <h2 className="text-2xl font-bold mb-2 mx-3">Les modules disponibles</h2>
+                  <div className="col-lg-8">
+                    <TextField
+                      type="text"
+                      label="Rechercher par le nom de module..."
+                      className="form-control"
+                      value={searchTerm}
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <SearchIcon />
+                          </InputAdornment>
+                        ),
+                      }}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                  </div>
+                </div>
               </CCardHeader>
             </div>
-            <div className="col-lg-8">
-              <input
-                type="text"
-                placeholder="Rechercher par le nom de module..."
-                className="form-control"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <div className="col-lg-1 d-flex justify-content-lg-end mt-3 mt-lg-0">
+            <div className="mt-3 mt-lg-0 text-end">
               <AddModuleDialog fetchModules={fetchModules} />
             </div>
           </div>
-          <CTable align="middle" className="mb-0 border" striped responsive>
+          <CTable align="middle" className="mb-0 border" hover striped responsive>
             <CTableCaption>Détails des Modules</CTableCaption>
             <CTableHead color="dark">
               <CTableRow>
-                <CTableHeaderCell scope="col">Nom de Module</CTableHeaderCell>
-                <CTableHeaderCell scope="col">Nom du Filière</CTableHeaderCell>
-                <CTableHeaderCell scope="col">Description du Filière</CTableHeaderCell>
-                <CTableHeaderCell scope="col"></CTableHeaderCell>
-                <CTableHeaderCell scope="col"></CTableHeaderCell>
+                <CTableHeaderCell
+                  style={{ backgroundColor: '#57A6A1', color: 'white', fontWeight: 'bold' }}
+                >
+                  Nom de Module
+                </CTableHeaderCell>
+                <CTableHeaderCell
+                  style={{ backgroundColor: '#57A6A1', color: 'white', fontWeight: 'bold' }}
+                >
+                  Nom du Filière
+                </CTableHeaderCell>
+                <CTableHeaderCell
+                  style={{ backgroundColor: '#57A6A1', color: 'white', fontWeight: 'bold' }}
+                >
+                  Description du Filière
+                </CTableHeaderCell>
+                <CTableHeaderCell
+                  style={{ backgroundColor: '#57A6A1', color: 'white', fontWeight: 'bold' }}
+                  className="text-center"
+                >
+                  {' '}
+                  <BlurOnRounded sx={{ fontSize: 30 }} />
+                </CTableHeaderCell>
               </CTableRow>
             </CTableHead>
             <CTableBody hover>
@@ -125,17 +153,13 @@ export default function Module() {
                   <CTableDataCell>{module.nomModule}</CTableDataCell>
                   <CTableDataCell>{module.nomFilière}</CTableDataCell>
                   <CTableDataCell>{module.description}</CTableDataCell>
-                  <CTableDataCell>
+                  <CTableDataCell className="text-center">
                     <UpdateModule module={module} fetchModules={fetchModules} />
-                  </CTableDataCell>
-                  <CTableDataCell>
-                    <Fab
-                      style={{ backgroundColor: '#C40C0C', color: 'white' }}
-                      size="small"
+                    <DeleteRounded
+                      sx={{ fontSize: 30 }}
+                      color="error"
                       onClick={() => handleOpenModal(module.moduleId)}
-                    >
-                      <DeleteOutlinedIcon />
-                    </Fab>
+                    />
                   </CTableDataCell>
                 </CTableRow>
               ))}
@@ -185,9 +209,10 @@ export default function Module() {
         <CModalBody>Êtes-vous sûr de vouloir supprimer ce module ?</CModalBody>
         <CModalFooter>
           <CButton
+            shape="rounded-pill"
             style={{
               marginTop: '10px',
-              padding: '10px 20px',
+              padding: '10px 30px',
               fontSize: '16px',
               fontWeight: 'bold',
               borderRadius: '10px',
@@ -201,6 +226,7 @@ export default function Module() {
             Oui
           </CButton>
           <CButton
+            shape="rounded-pill"
             style={{
               marginTop: '10px',
               marginLeft: '10px',
@@ -210,6 +236,7 @@ export default function Module() {
               borderRadius: '5px',
               border: '2px solid #dc3545',
               color: '#dc3545',
+              backgroundColor: 'transparent',
               cursor: 'pointer',
             }}
             onClick={() => setVisible(false)}

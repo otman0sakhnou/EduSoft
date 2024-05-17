@@ -20,12 +20,14 @@ import {
   CModalBody,
   CModalFooter,
 } from '@coreui/react'
-import DeleteOutlinedIcon from '@mui/icons-material/DeleteTwoTone'
-import Fab from '@mui/material/Fab'
+import SearchIcon from '@mui/icons-material/Search'
 import { getFilières, deleteFilière } from '../../Actions/BackOfficeActions/FilièreActions'
 import AddFiliereDialog from './AddFilière'
 import toast from 'react-hot-toast'
 import UpdateFiliereDialog from './UpdateFilière'
+import DeleteRounded from '@mui/icons-material/DeleteRounded'
+import BlurOnRounded from '@mui/icons-material/BlurOnRounded'
+import { InputAdornment, TextField } from '@mui/material'
 
 export default function Filière() {
   const [filières, setFilières] = useState([])
@@ -94,48 +96,72 @@ export default function Filière() {
         <CCardBody>
           <div className="container">
             <div className="row mb-4 align-items-center">
-              <div className="col-lg-3 mb-3">
+              <div className="col-lg-12 mb-3">
                 <CCardHeader>
-                  <h1 className="text-2xl font-bold mb-2">Les filières disponibles</h1>
+                  <div className="d-flex align-items-center">
+                    <h2 className="text-2xl font-bold mb-2 mx-3">Les filières disponibles</h2>
+                    <div className="col-lg-8 ml-auto">
+                      <TextField
+                        type="text"
+                        label="Rechercher par le nom de filière..."
+                        className="form-control"
+                        value={searchTerm}
+                        InputProps={{
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              <SearchIcon />
+                            </InputAdornment>
+                          ),
+                        }}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                      />
+                    </div>
+                  </div>
                 </CCardHeader>
               </div>
-              <div className="col-lg-8">
-                <input
-                  type="text"
-                  placeholder="Rechercher par le nom de filière..."
-                  className="form-control"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-              <div className="col-lg-1 d-flex justify-content-lg-end mt-3 mt-lg-0">
+
+              <div className="mt-3 mt-lg-0 text-end">
                 <AddFiliereDialog fetchFilières={fetchFilières} />
               </div>
             </div>
-            <CTable align="middle" className="mb-0 border" striped responsive>
+            <CTable align="middle" className="mb-0 border" hover striped responsive>
               <CTableCaption>Détails des Filières</CTableCaption>
-              <CTableHead color="dark">
+              <CTableHead>
                 <CTableRow>
-                  <CTableHeaderCell>Nom de Filière</CTableHeaderCell>
-                  <CTableHeaderCell scope="col">Description du Filière</CTableHeaderCell>
-                  <CTableHeaderCell className="text-center" scope="col"></CTableHeaderCell>
+                  <CTableHeaderCell
+                    style={{ backgroundColor: '#57A6A1', color: 'white', fontWeight: 'bold' }}
+                  >
+                    Nom de Filière
+                  </CTableHeaderCell>
+                  <CTableHeaderCell
+                    style={{ backgroundColor: '#57A6A1', color: 'white', fontWeight: 'bold' }}
+                  >
+                    Description du Filière
+                  </CTableHeaderCell>
+                  <CTableHeaderCell
+                    style={{ backgroundColor: '#57A6A1', color: 'white', fontWeight: 'bold' }}
+                    className="text-center"
+                  >
+                    <BlurOnRounded sx={{ fontSize: 30 }} />
+                  </CTableHeaderCell>
                 </CTableRow>
               </CTableHead>
               <CTableBody hover>
                 {currentItems.map((filière) => (
                   <CTableRow key={filière.idFilière}>
-                    <CTableDataCell>{filière.nomFilière}</CTableDataCell>
-                    <CTableDataCell>{filière.description}</CTableDataCell>
-                    <CTableDataCell>
+                    <CTableDataCell style={{ fontWeight: 'bold' }}>
+                      {filière.nomFilière}
+                    </CTableDataCell>
+                    <CTableDataCell style={{ fontWeight: 'bold' }}>
+                      {filière.description}
+                    </CTableDataCell>
+                    <CTableDataCell className="col-sm-2 text-center" style={{ fontWeight: 'bold' }}>
                       <UpdateFiliereDialog filière={filière} fetchFilières={fetchFilières} />
-                      <Fab
-                        style={{ backgroundColor: '#C40C0C', color: 'white' }}
-                        size="small"
-                        className="mx-5"
+                      <DeleteRounded
+                        fontSize="large"
                         onClick={() => handleDelete(filière.idFilière)}
-                      >
-                        <DeleteOutlinedIcon />
-                      </Fab>
+                        color="error"
+                      />
                     </CTableDataCell>
                   </CTableRow>
                 ))}
@@ -183,9 +209,10 @@ export default function Filière() {
         <CModalBody>Êtes-vous sûr de vouloir supprimer cette filière ?</CModalBody>
         <CModalFooter>
           <CButton
+            shape="rounded-pill"
             style={{
               marginTop: '10px',
-              padding: '10px 20px',
+              padding: '10px 30px',
               fontSize: '16px',
               fontWeight: 'bold',
               borderRadius: '10px',
@@ -199,6 +226,7 @@ export default function Filière() {
             Oui
           </CButton>
           <CButton
+            shape="rounded-pill"
             style={{
               marginTop: '10px',
               marginLeft: '10px',

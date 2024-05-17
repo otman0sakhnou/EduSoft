@@ -65,9 +65,21 @@ export default function AddGroupeDialog({ fetchGroupe }) {
 
   return (
     <>
-      <Fab size="medium" color="success" onClick={handleClickOpen}>
-        <AddIcon />
-      </Fab>
+      <CButton
+        onClick={handleClickOpen}
+        shape="rounded-pill"
+        style={{
+          backgroundColor: '#4CCD99',
+          marginTop: '10px',
+          padding: '10px 30px',
+          fontSize: '16px',
+          fontWeight: 'bold',
+          cursor: 'pointer',
+          color: 'white',
+        }}
+      >
+        Ajouter un groupe
+      </CButton>
       <CModal
         alignment="center"
         visible={open}

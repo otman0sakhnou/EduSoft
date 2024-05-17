@@ -70,17 +70,18 @@ const _nav = [
   {
     component: CNavGroup,
     name: 'Gestion des Factures',
+    to: '/gestionFactures',
     icon: <CIcon icon={cilNotes} customClassName="nav-icon" />,
     items: [
       {
         component: CNavItem,
         name: 'Régler les Factures',
-        to: '/regler-factures',
+        to: '/gestionFactures/regler-factures',
       },
       {
         component: CNavItem,
-        name: 'Examiner les Factures',
-        to: '/examiner-factures',
+        name: 'les Factures',
+        to: '/gestionFactures/examiner-factures',
       },
     ],
   },

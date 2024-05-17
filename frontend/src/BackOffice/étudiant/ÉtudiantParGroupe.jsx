@@ -36,7 +36,8 @@ import * as XLSX from 'xlsx/xlsx.mjs'
 import CloudUploadIcon from '@mui/icons-material/CloudUpload'
 import { createStudent } from '../../Actions/BackOfficeActions/ÉtudiantActions'
 import BlurOnRoundedIcon from '@mui/icons-material/BlurOnRounded'
-
+import { InputAdornment, TextField } from '@mui/material'
+import SearchIcon from '@mui/icons-material/Search'
 export default function ÉtudiantParGroupe() {
   const { nomGroupe } = useParams()
   const [students, setStudents] = useState([])
@@ -231,12 +232,19 @@ export default function ÉtudiantParGroupe() {
               <h2 className="text-2xl font-bold mb-2">La liste des étudiants de {nomGroupe}</h2>
             </CCol>
             <CCol>
-              <input
+              <TextField
                 type="text"
-                placeholder="Rechercher par le nom d'étudiant..."
+                label="Rechercher par le nom d'étudiant"
                 className="form-control"
                 value={searchTerm}
                 onChange={handleSearch}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                }}
               />
             </CCol>
           </CRow>
@@ -258,58 +266,97 @@ export default function ÉtudiantParGroupe() {
             >
               <CTableHead className="text-nowrap">
                 <CTableRow>
-                  <CTableHeaderCell className="bg-body-tertiary" scope="col">
+                  <CTableHeaderCell
+                    style={{ backgroundColor: '#57A6A1', color: 'white' }}
+                    scope="col"
+                  >
                     CNE
                   </CTableHeaderCell>
-                  <CTableHeaderCell className="bg-body-tertiary" scope="col">
+                  <CTableHeaderCell
+                    style={{ backgroundColor: '#57A6A1', color: 'white', fontWeight: 'bold' }}
+                    scope="col"
+                  >
                     CIN
                   </CTableHeaderCell>
-                  <CTableHeaderCell className="bg-body-tertiary" scope="col">
+                  <CTableHeaderCell
+                    style={{ backgroundColor: '#57A6A1', color: 'white', fontWeight: 'bold' }}
+                    scope="col"
+                  >
                     Nom
                   </CTableHeaderCell>
-                  <CTableHeaderCell className="bg-body-tertiary" scope="col">
+                  <CTableHeaderCell
+                    style={{ backgroundColor: '#57A6A1', color: 'white', fontWeight: 'bold' }}
+                    scope="col"
+                  >
                     Prénom
                   </CTableHeaderCell>
-                  <CTableHeaderCell className="bg-body-tertiary" scope="col" xs>
+                  <CTableHeaderCell
+                    style={{ backgroundColor: '#57A6A1', color: 'white', fontWeight: 'bold' }}
+                    scope="col"
+                    xs
+                  >
                     Date de naissance
                   </CTableHeaderCell>
-                  <CTableHeaderCell className="bg-body-tertiary" scope="col" xs>
+                  <CTableHeaderCell
+                    style={{ backgroundColor: '#57A6A1', color: 'white', fontWeight: 'bold' }}
+                    scope="col"
+                    xs
+                  >
                     Lieu de naissance
                   </CTableHeaderCell>
-                  <CTableHeaderCell className="bg-body-tertiary" scope="col">
+                  <CTableHeaderCell
+                    style={{ backgroundColor: '#57A6A1', color: 'white', fontWeight: 'bold' }}
+                    scope="col"
+                  >
                     Adresse
                   </CTableHeaderCell>
-                  <CTableHeaderCell className="bg-body-tertiary" scope="col">
+                  <CTableHeaderCell
+                    style={{ backgroundColor: '#57A6A1', color: 'white', fontWeight: 'bold' }}
+                    scope="col"
+                  >
                     Téléphone
                   </CTableHeaderCell>
-                  <CTableHeaderCell className="bg-body-tertiary" scope="col">
+                  <CTableHeaderCell
+                    style={{ backgroundColor: '#57A6A1', color: 'white', fontWeight: 'bold' }}
+                    scope="col"
+                  >
                     Email
                   </CTableHeaderCell>
-                  <CTableHeaderCell className="bg-body-tertiary">
-                    <BlurOnRoundedIcon />
-                  </CTableHeaderCell>
-                  <CTableHeaderCell className="bg-body-tertiary">
-                    <BlurOnRoundedIcon />
+                  <CTableHeaderCell
+                    style={{ backgroundColor: '#57A6A1', color: 'white', fontWeight: 'bold' }}
+                  >
+                    <BlurOnRoundedIcon sx={{ fontSize: 32 }} />
                   </CTableHeaderCell>
                 </CTableRow>
               </CTableHead>
               <CTableBody>
                 {currentItems.map((student) => (
                   <CTableRow key={student.etudiantId}>
-                    <CTableDataCell>{student.cne}</CTableDataCell>
-                    <CTableDataCell>{student.cin}</CTableDataCell>
-                    <CTableDataCell>{student.nom}</CTableDataCell>
-                    <CTableDataCell>{student.prenom}</CTableDataCell>
-                    <CTableDataCell>{student.dateDeNaissance}</CTableDataCell>
-                    <CTableDataCell>{student.lieuDeNaissance}</CTableDataCell>
-                    <CTableDataCell>{student.adresse}</CTableDataCell>
-                    <CTableDataCell>{student.telephone}</CTableDataCell>
-                    <CTableDataCell>{student.email}</CTableDataCell>
-                    <CTableDataCell className="text-center">
-                      <UpdateÉtudiant student={student} fetchStudents={fetchStudents} />
+                    <CTableDataCell style={{ fontWeight: 'bold' }}>{student.cne}</CTableDataCell>
+                    <CTableDataCell style={{ fontWeight: 'bold' }}>{student.cin}</CTableDataCell>
+                    <CTableDataCell style={{ fontWeight: 'bold' }}>{student.nom}</CTableDataCell>
+                    <CTableDataCell style={{ fontWeight: 'bold' }}>{student.prenom}</CTableDataCell>
+                    <CTableDataCell style={{ fontWeight: 'bold' }}>
+                      {student.dateDeNaissance}
                     </CTableDataCell>
-                    <CTableDataCell className="text-center">
+                    <CTableDataCell style={{ fontWeight: 'bold' }}>
+                      {student.lieuDeNaissance}
+                    </CTableDataCell>
+                    <CTableDataCell style={{ fontWeight: 'bold' }}>
+                      {student.adresse}
+                    </CTableDataCell>
+                    <CTableDataCell style={{ fontWeight: 'bold' }}>
+                      {student.telephone}
+                    </CTableDataCell>
+                    <CTableDataCell style={{ fontWeight: 'bold' }}>{student.email}</CTableDataCell>
+                    <CTableDataCell
+                      colSpan={2}
+                      style={{ fontWeight: 'bold' }}
+                      className="col-sm-1 text-center"
+                    >
+                      <UpdateÉtudiant student={student} fetchStudents={fetchStudents} />
                       <DeleteRoundedIcon
+                        sx={{ fontSize: 30 }}
                         onClick={() => handleOpenModalDelete(student.etudiantId)}
                         color="error"
                       />
@@ -402,16 +449,16 @@ export default function ÉtudiantParGroupe() {
             </CCol>
             <CCol>
               <CButton
-                color="success"
                 onClick={handleOpenModal}
                 shape="rounded-pill"
                 style={{
+                  backgroundColor: '#4CCD99',
                   marginTop: '10px',
                   padding: '10px 30px',
                   fontSize: '16px',
                   fontWeight: 'bold',
-                  color: 'white',
                   cursor: 'pointer',
+                  color: 'white',
                 }}
               >
                 Ajouter ces étudiants

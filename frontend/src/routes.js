@@ -8,6 +8,9 @@ const User = React.lazy(() => import('./BackOffice/User'))
 const ReportAbsence = React.lazy(() => import('./BackOffice/absence/ReportAbsence'))
 const Review = React.lazy(() => import('./BackOffice/absence/ReviewAbsence'))
 //
+const Facture = React.lazy(() => import('./BackOffice/facture/Facture'))
+const ReviewFacture = React.lazy(() => import('./BackOffice/facture/ReviewWorkedHours'))
+//
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
 
 const routes = [
@@ -35,6 +38,18 @@ const routes = [
     path: '/gestionAbsence/examiner-absences',
     name: 'Examiner les Absences',
     element: Review,
+  },
+  { path: '/gestionFactures', name: 'Gestion des Factures', exact: true },
+
+  {
+    path: '/gestionFactures/examiner-factures',
+    name: 'Les Factures',
+    element: Facture,
+  },
+  {
+    path: '/gestionFactures/regler-factures',
+    name: 'Régler les Factures',
+    element: ReviewFacture,
   },
 ]
 

@@ -9,8 +9,7 @@ import {
   CModalFooter,
   CFormSelect,
 } from '@coreui/react'
-import { TextField, MenuItem, Select, Fab } from '@mui/material/'
-import AddIcon from '@mui/icons-material/Add'
+import { TextField, MenuItem, Select } from '@mui/material/'
 import { getGroupes } from '../../Actions/BackOfficeActions/GroupeActions'
 import { createStudent } from '../../Actions/BackOfficeActions/ÉtudiantActions'
 import { toast } from 'react-hot-toast'
@@ -131,10 +130,10 @@ export default function AddÉtudiant({ fetchStudents }) {
   return (
     <>
       <CButton
-        color="success"
-        shape="rounded-pill"
         onClick={handleOpen}
+        shape="rounded-pill"
         style={{
+          backgroundColor: '#4CCD99',
           marginTop: '10px',
           padding: '10px 30px',
           fontSize: '16px',

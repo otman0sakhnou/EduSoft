@@ -20,48 +20,48 @@ import {
   CModalBody,
   CModalFooter,
 } from '@coreui/react'
-import DeleteOutlinedIcon from '@mui/icons-material/DeleteTwoTone'
-import Fab from '@mui/material/Fab'
-import { getGroupes } from '../../Actions/BackOfficeActions/GroupeActions'
-import { deleteGroupe } from '../../Actions/BackOfficeActions/GroupeActions'
-import AddGroupeDialog from './AddGroupe'
+import SearchIcon from '@mui/icons-material/Search'
+import { getAllFactures, deleteFacture } from '../../Actions/BackOfficeActions/FactureActions'
 import toast from 'react-hot-toast'
-import UpdateGroupeDialog from './UpdateGroupe'
-import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye'
-import { Link } from 'react-router-dom'
-import { InputAdornment, TextField } from '@mui/material'
-import Search from '@mui/icons-material/Search'
 import DeleteRounded from '@mui/icons-material/DeleteRounded'
 import BlurOnRounded from '@mui/icons-material/BlurOnRounded'
+import { InputAdornment, TextField } from '@mui/material'
 
-export default function Groupe() {
-  const [groupes, setGroupes] = useState([])
+export default function Facture() {
+  const [factures, setFactures] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage] = useState(5)
   const [searchTerm, setSearchTerm] = useState('')
+  const [searchDate, setSearchDate] = useState('')
   const [visible, setVisible] = useState(false)
-  const [groupeIdToDelete, setGroupeIdToDelete] = useState(null)
+  const [factureID, setFactureId] = useState(null)
 
   useEffect(() => {
-    fetchGroupe()
+    fetchFactures()
   }, [])
-  //get all groupes
-  const fetchGroupe = async () => {
+
+  const fetchFactures = async () => {
     try {
-      const data = await getGroupes()
-      setGroupes(data)
+      const data = await getAllFactures()
+      setFactures(data)
     } catch (error) {
       console.error('Error fetching data:', error)
     }
   }
 
+  const filterFactures = factures.filter((f) => {
+    const matchesName = f.nomProfesseur.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesDate = searchDate ? f.dateFacture.includes(searchDate) : true
+    return matchesName && matchesDate
+  })
+
   const handleDelete = async (id) => {
     try {
       if (!id) {
-        console.error('Error deleting groupe: ID is undefined')
+        console.error('Error deleting facture: ID is undefined')
         return
       }
-      setGroupeIdToDelete(id)
+      setFactureId(id)
       setVisible(true)
     } catch (error) {
       console.error('Error showing confirmation dialog:', error)
@@ -70,28 +70,25 @@ export default function Groupe() {
 
   const deleteConfirmed = async () => {
     try {
-      const success = await deleteGroupe(groupeIdToDelete)
+      const success = await deleteFacture(factureID)
       if (success) {
-        fetchGroupe()
-        toast.success('Groupe supprimé avec succès')
+        fetchFactures()
+        toast.success('Facture supprimée avec succès')
         if (currentItems.length === 1 && currentPage > 1) {
           setCurrentPage(currentPage - 1)
         }
       }
     } catch (error) {
-      console.error('Error deleting groupe:', error)
-      toast.error('Échec de la suppression de groupe')
+      console.error('Error deleting Facture:', error)
+      toast.error('Échec de la suppression de Facture')
     }
     setVisible(false)
   }
 
-  const filterGroupes = groupes.filter((groupe) => {
-    return groupe.nomGroupe.toLowerCase().includes(searchTerm.toLowerCase())
-  })
   const indexOfLastItem = currentPage * itemsPerPage
   const indexOfFirstItem = indexOfLastItem - itemsPerPage
-  const currentItems = filterGroupes.slice(indexOfFirstItem, indexOfLastItem)
-  const hasNextPage = currentPage < Math.ceil(filterGroupes.length / itemsPerPage)
+  const currentItems = filterFactures.slice(indexOfFirstItem, indexOfLastItem)
+  const hasNextPage = currentPage < Math.ceil(filterFactures.length / itemsPerPage)
   const hasPreviousPage = currentPage > 1
 
   return (
@@ -103,21 +100,32 @@ export default function Groupe() {
               <div className="col-lg-12 mb-3">
                 <CCardHeader>
                   <div className="d-flex align-items-center">
-                    <h2 className="text-2xl font-bold mx-3">Les groupes disponibles</h2>
-                    <div className="col-lg-8">
+                    <h2 className="text-2xl font-bold mb-2 mx-5">Les factures disponibles</h2>
+                    <div className="col-sm-7 d-flex">
                       <TextField
                         type="text"
-                        placeholder="Rechercher par le nom de groupe ..."
+                        label="Rechercher par le nom de proffesseur"
                         className="form-control"
                         value={searchTerm}
                         InputProps={{
                           endAdornment: (
                             <InputAdornment position="end">
-                              <Search />
+                              <SearchIcon />
                             </InputAdornment>
                           ),
                         }}
                         onChange={(e) => setSearchTerm(e.target.value)}
+                      />
+                      <TextField
+                        type="date"
+                        label="Rechercher par date..."
+                        className="form-control ml-3"
+                        InputLabelProps={{
+                          shrink: true,
+                        }}
+                        value={searchDate}
+                        onChange={(e) => setSearchDate(e.target.value)}
+                        style={{ marginLeft: '16px' }}
                       />
                     </div>
                   </div>
@@ -125,55 +133,67 @@ export default function Groupe() {
               </div>
 
               <div className="mt-3 mt-lg-0 text-end">
-                <AddGroupeDialog fetchGroupe={fetchGroupe} />
+                {/* <AddFactureDialog fetchFactures={fetchFactures} /> */}
               </div>
             </div>
             <CTable align="middle" className="mb-0 border" hover striped responsive>
-              <CTableCaption>Détails des Groupes</CTableCaption>
+              <CTableCaption>Détails des Factures</CTableCaption>
               <CTableHead>
                 <CTableRow>
                   <CTableHeaderCell
                     style={{ backgroundColor: '#57A6A1', color: 'white', fontWeight: 'bold' }}
                   >
-                    Nom de Groupe
+                    Nom de Proffesseur
                   </CTableHeaderCell>
                   <CTableHeaderCell
                     style={{ backgroundColor: '#57A6A1', color: 'white', fontWeight: 'bold' }}
                   >
-                    Nom du Filière
+                    Date de Facture
                   </CTableHeaderCell>
                   <CTableHeaderCell
                     style={{ backgroundColor: '#57A6A1', color: 'white', fontWeight: 'bold' }}
                   >
-                    Description du Filière
+                    Montant ParHeure
+                  </CTableHeaderCell>
+                  <CTableHeaderCell
+                    style={{ backgroundColor: '#57A6A1', color: 'white', fontWeight: 'bold' }}
+                  >
+                    Total Heures
+                  </CTableHeaderCell>
+                  <CTableHeaderCell
+                    style={{ backgroundColor: '#57A6A1', color: 'white', fontWeight: 'bold' }}
+                  >
+                    Montant Total
                   </CTableHeaderCell>
                   <CTableHeaderCell
                     style={{ backgroundColor: '#57A6A1', color: 'white', fontWeight: 'bold' }}
                     className="text-center"
                   >
-                    {' '}
                     <BlurOnRounded sx={{ fontSize: 30 }} />
                   </CTableHeaderCell>
                 </CTableRow>
               </CTableHead>
               <CTableBody hover>
-                {currentItems.map((groupe, index) => (
-                  <CTableRow key={index}>
-                    <CTableDataCell>{groupe.nomGroupe}</CTableDataCell>
-                    <CTableDataCell>{groupe.nomFilière}</CTableDataCell>
-                    <CTableDataCell>{groupe.description}</CTableDataCell>
-                    <CTableDataCell className="text-center">
-                      <Link
-                        to={`/étudiant/ÉtudiantParGroupe/${groupe.nomGroupe}`}
-                        style={{ color: 'inherit', textDecoration: 'none' }}
-                      >
-                        <RemoveRedEyeIcon style={{ color: '#FFC55A' }} />
-                      </Link>
-                      <UpdateGroupeDialog groupe={groupe} fetchGroupe={fetchGroupe} />
+                {currentItems.map((facture) => (
+                  <CTableRow key={facture.idFacture}>
+                    <CTableDataCell style={{ fontWeight: 'bold' }}>
+                      {facture.nomProfesseur}
+                    </CTableDataCell>
+                    <CTableDataCell style={{ fontWeight: 'bold' }}>{facture.mois}</CTableDataCell>
+                    <CTableDataCell style={{ fontWeight: 'bold' }}>
+                      {facture.montantParHeure} Dh
+                    </CTableDataCell>
+                    <CTableDataCell style={{ fontWeight: 'bold' }}>
+                      {facture.totalHeures}
+                    </CTableDataCell>
+                    <CTableDataCell style={{ fontWeight: 'bold' }}>
+                      {facture.montantTotale} Dh
+                    </CTableDataCell>
+                    <CTableDataCell className="col-sm-2 text-center" style={{ fontWeight: 'bold' }}>
                       <DeleteRounded
-                        sx={{ fontSize: 30 }}
-                        style={{ color: '#E72929' }}
-                        onClick={() => handleDelete(groupe.groupeID)}
+                        fontSize="large"
+                        onClick={() => handleDelete(facture.factureId)}
+                        color="error"
                       />
                     </CTableDataCell>
                   </CTableRow>
@@ -189,7 +209,7 @@ export default function Groupe() {
                 >
                   <span aria-hidden="true">&laquo;</span>
                 </CPaginationItem>
-                {Array.from({ length: Math.ceil(groupes.length / itemsPerPage) }, (_, index) => (
+                {Array.from({ length: Math.ceil(factures.length / itemsPerPage) }, (_, index) => (
                   <CPaginationItem
                     key={index}
                     active={index + 1 === currentPage}
@@ -219,7 +239,7 @@ export default function Groupe() {
         <CModalHeader>
           <CModalTitle id="StaticBackdropExampleLabel">Confirmer l'action</CModalTitle>
         </CModalHeader>
-        <CModalBody>Êtes-vous sûr de vouloir supprimer ce groupe ?</CModalBody>
+        <CModalBody>Êtes-vous sûr de vouloir supprimer cette facture ?</CModalBody>
         <CModalFooter>
           <CButton
             shape="rounded-pill"
@@ -228,6 +248,7 @@ export default function Groupe() {
               padding: '10px 30px',
               fontSize: '16px',
               fontWeight: 'bold',
+              borderRadius: '10px',
               border: '2px solid #007bff',
               color: '#ffffff',
               backgroundColor: '#007bff',
@@ -245,6 +266,7 @@ export default function Groupe() {
               padding: '10px 20px',
               fontSize: '16px',
               fontWeight: 'bold',
+              borderRadius: '5px',
               border: '2px solid #dc3545',
               color: '#dc3545',
               backgroundColor: 'transparent',

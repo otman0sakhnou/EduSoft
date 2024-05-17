@@ -122,7 +122,7 @@ export default function UpdateÉtudiant({ student, fetchStudents }) {
 
   return (
     <>
-      <EditRoundedIcon color="primary" onClick={handleOpen} />
+      <EditRoundedIcon sx={{ fontSize: 30 }} color="primary" onClick={handleOpen} />
 
       <CModal visible={open} onClose={handleClose} aria-labelledby="staticBackdropLabel">
         <CModalHeader closeButton>

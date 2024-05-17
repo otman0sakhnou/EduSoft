@@ -63,9 +63,21 @@ export default function AddModuleDialog({ fetchModules }) {
 
   return (
     <>
-      <Fab size="medium" color="success" onClick={handleClickOpen}>
-        <AddIcon />
-      </Fab>
+      <CButton
+        onClick={handleClickOpen}
+        shape="rounded-pill"
+        style={{
+          backgroundColor: '#4CCD99',
+          marginTop: '10px',
+          padding: '10px 30px',
+          fontSize: '16px',
+          fontWeight: 'bold',
+          cursor: 'pointer',
+          color: 'white',
+        }}
+      >
+        Ajouter un module
+      </CButton>
       <CModal
         alignment="center"
         visible={open}
@@ -132,10 +144,10 @@ export default function AddModuleDialog({ fetchModules }) {
           <CButton
             type="submit"
             onClick={handleSaveModule}
-            color="primary"
+            shape="rounded-pill"
             style={{
               marginTop: '10px',
-              padding: '10px 20px',
+              padding: '10px 30px',
               fontSize: '16px',
               fontWeight: 'bold',
               borderRadius: '10px',
@@ -149,13 +161,14 @@ export default function AddModuleDialog({ fetchModules }) {
           </CButton>
           <CButton
             onClick={handleClose}
-            color="secondary"
+            shape="rounded-pill"
             style={{
               marginTop: '10px',
+              marginLeft: '10px',
               padding: '10px 20px',
               fontSize: '16px',
               fontWeight: 'bold',
-              borderRadius: '10px',
+              borderRadius: '5px',
               border: '2px solid #dc3545',
               color: '#dc3545',
               backgroundColor: 'transparent',

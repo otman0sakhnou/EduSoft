@@ -1,18 +1,15 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import TextField from '@mui/material/TextField'
-import 'react-confirm-alert/src/react-confirm-alert.css'
-import { createFiliere } from '../../Actions/BackOfficeActions/FilièreActions'
 import { toast } from 'react-hot-toast'
 import { CButton, CModal, CModalHeader, CModalTitle, CModalBody, CModalFooter } from '@coreui/react'
 import { useAuth } from 'react-oidc-context'
+import { addFacture } from '../../Actions/BackOfficeActions/FactureActions' // Adjust import as needed
 
-export default function AddFiliereDialog({ fetchFilières }) {
+export default function AddFiliereDialog({ selectedProfessor, selectedMonth, totalHours }) {
   const [open, setOpen] = useState(false)
-  const [NomFilière, setNomFiliere] = useState('')
-  const [description, setDescription] = useState('')
-  const [nomFiliereError, setNomFiliereError] = useState(false)
-  const [descriptionError, setDescriptionError] = useState(false)
+  const [montantParHeure, setMontantParHeure] = useState('')
+  const [montantParHeureError, setMontantParHeureError] = useState(false)
   const auth = useAuth()
   const accessToken = auth?.user?.access_token
 
@@ -24,26 +21,32 @@ export default function AddFiliereDialog({ fetchFilières }) {
     setOpen(false)
   }
 
-  const handleSaveFiliere = async () => {
+  const handleSaveInvoice = async () => {
     let hasError = false
-    if (!NomFilière || !/^[A-Za-z\séÉ]+$/.test(NomFilière)) {
-      setNomFiliereError(true)
+    if (!montantParHeure || isNaN(montantParHeure) || parseFloat(montantParHeure) <= 0) {
+      setMontantParHeureError(true)
       hasError = true
+    } else {
+      setMontantParHeureError(false)
     }
-    if (!description) {
-      setDescriptionError(true)
-      hasError = true
-    }
+
     if (hasError) return
 
     try {
       setOpen(false)
-      await createFiliere({ NomFilière, description }, accessToken)
-      fetchFilières()
-      toast.success('Filière ajouté avec succès')
+      await addFacture(
+        {
+          NomProfesseur: selectedProfessor,
+          Mois: selectedMonth,
+          MontantParHeure: parseFloat(montantParHeure),
+          TotalHeures: totalHours,
+        },
+        accessToken,
+      )
+      toast.success('Facture ajoutée avec succès')
     } catch (error) {
-      console.error('Error creating filiere:', error)
-      toast.error("Erreur lors de l'ajout")
+      console.error('Error creating invoice:', error)
+      toast.error("Erreur lors de l'ajout de la facture")
     }
   }
 
@@ -62,7 +65,7 @@ export default function AddFiliereDialog({ fetchFilières }) {
           color: 'white',
         }}
       >
-        Ajouter une filiére
+        Ajouter une facture
       </CButton>
       <CModal
         alignment="center"
@@ -71,57 +74,33 @@ export default function AddFiliereDialog({ fetchFilières }) {
         aria-labelledby="StaticBackdropExampleLabel"
       >
         <CModalHeader closeButton>
-          <CModalTitle id="StaticBackdropExampleLabel">Ajouter une nouvelle Filière</CModalTitle>
+          <CModalTitle id="StaticBackdropExampleLabel">Ajouter une nouvelle facture</CModalTitle>
         </CModalHeader>
         <CModalBody>
-          <div>Remplissez les détails pour la nouvelle filière</div>
+          <div>Remplissez les détails pour la nouvelle facture</div>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <TextField
                 autoFocus
-                error={nomFiliereError}
+                error={montantParHeureError}
                 helperText={
-                  nomFiliereError
-                    ? NomFilière
-                      ? 'Veuillez entrer un nom valide (lettres uniquement)'
-                      : 'Le nom du filière est requis'
+                  montantParHeureError
+                    ? montantParHeure
+                      ? 'Veuillez entrer un montant valide (chiffres uniquement, supérieur à 0)'
+                      : 'Le montant est requis'
                     : ''
                 }
                 margin="dense"
-                id="name"
-                name="NomFilière"
-                label="Nom du Filière"
+                id="montantParHeure"
+                name="MontantParHeure"
+                label="Montant par heure"
                 type="text"
                 fullWidth
                 variant="outlined"
-                value={NomFilière}
+                value={montantParHeure}
                 onChange={(e) => {
-                  setNomFiliere(e.target.value)
-                  setNomFiliereError(false)
-                }}
-              />
-              <TextField
-                error={descriptionError}
-                helperText={
-                  descriptionError
-                    ? description
-                      ? 'Veuillez entrer une description valide (lettres uniquement)'
-                      : 'Le nom du filière est requis'
-                    : ''
-                }
-                margin="dense"
-                id="description"
-                name="description"
-                label="Description"
-                type="text"
-                fullWidth
-                multiline
-                rows={4}
-                variant="outlined"
-                value={description}
-                onChange={(e) => {
-                  setDescription(e.target.value)
-                  setDescriptionError(false)
+                  setMontantParHeure(e.target.value)
+                  setMontantParHeureError(false)
                 }}
               />
             </div>
@@ -130,7 +109,7 @@ export default function AddFiliereDialog({ fetchFilières }) {
         <CModalFooter>
           <CButton
             type="submit"
-            onClick={handleSaveFiliere}
+            onClick={handleSaveInvoice}
             shape="rounded-pill"
             style={{
               marginTop: '10px',
@@ -169,6 +148,9 @@ export default function AddFiliereDialog({ fetchFilières }) {
     </>
   )
 }
+
 AddFiliereDialog.propTypes = {
-  fetchFilières: PropTypes.func.isRequired, // Ensure fetchGroupe is a function and is required
+  selectedProfessor: PropTypes.string.isRequired,
+  selectedMonth: PropTypes.string.isRequired,
+  totalHours: PropTypes.number.isRequired,
 }

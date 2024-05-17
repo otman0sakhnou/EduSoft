@@ -9,6 +9,7 @@ import { updateModule } from '../../Actions/BackOfficeActions/ModuleActions'
 import { getFilières } from '../../Actions/BackOfficeActions/FilièreActions'
 import { toast } from 'react-hot-toast'
 import { CButton, CModal, CModalHeader, CModalTitle, CModalBody, CModalFooter } from '@coreui/react'
+import EditRounded from '@mui/icons-material/EditRounded'
 
 export default function UpdateModule({ module, fetchModules }) {
   const [open, setOpen] = useState(false)
@@ -69,13 +70,12 @@ export default function UpdateModule({ module, fetchModules }) {
 
   return (
     <>
-      <Fab
-        style={{ backgroundColor: '#0E46A3', color: 'white' }}
-        size="small"
+      <EditRounded
+        sx={{ fontSize: 30 }}
+        className="mx-3"
+        color="primary"
         onClick={handleClickOpen}
-      >
-        <EditIcon />
-      </Fab>
+      />
       <CModal visible={open} onClose={handleClose} aria-labelledby="StaticBackdropExampleLabel">
         <CModalHeader closeButton>
           <CModalTitle id="StaticBackdropExampleLabel">Modifier le Module</CModalTitle>
@@ -128,13 +128,12 @@ export default function UpdateModule({ module, fetchModules }) {
           <CButton
             type="submit"
             onClick={handleUpdateModule}
-            color="primary"
+            shape="rounded-pill"
             style={{
               marginTop: '10px',
-              padding: '10px 20px',
+              padding: '10px 30px',
               fontSize: '16px',
               fontWeight: 'bold',
-              borderRadius: '10px',
               border: '2px solid #007bff',
               color: '#ffffff',
               backgroundColor: '#007bff',
@@ -145,13 +144,13 @@ export default function UpdateModule({ module, fetchModules }) {
           </CButton>
           <CButton
             onClick={handleClose}
-            color="danger"
+            shape="rounded-pill"
             style={{
               marginTop: '10px',
+              marginLeft: '10px',
               padding: '10px 20px',
               fontSize: '16px',
               fontWeight: 'bold',
-              borderRadius: '10px',
               border: '2px solid #dc3545',
               color: '#dc3545',
               backgroundColor: 'transparent',
