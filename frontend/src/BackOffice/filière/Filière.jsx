@@ -19,6 +19,7 @@ import {
   CModalTitle,
   CModalBody,
   CModalFooter,
+  CFormInput,
 } from '@coreui/react'
 import SearchIcon from '@mui/icons-material/Search'
 import { getFilières, deleteFilière } from '../../Actions/BackOfficeActions/FilièreActions'
@@ -97,18 +98,31 @@ export default function Filière() {
           <div className="container">
             <div className="row mb-4 align-items-center">
               <div className="col-lg-12 mb-3">
-                <CCardHeader>
+                <CCardHeader
+                  style={{
+                    padding: '0.75rem 1.25rem',
+                    borderBottom: '1px solid #dee2e6',
+                    borderRadius: '12px 12px 0 0',
+                  }}
+                >
                   <div className="d-flex align-items-center">
-                    <h2 className="text-2xl font-bold mb-2 mx-3">Les filières disponibles</h2>
+                    <h2
+                      style={{
+                        fontWeight: 'bold',
+                      }}
+                      className="mb-2 mx-3"
+                    >
+                      Les filières disponibles
+                    </h2>
                     <div className="col-lg-8 ml-auto">
-                      <TextField
+                      <CFormInput
                         type="text"
-                        label="Rechercher par le nom de filière..."
+                        placeholder="Rechercher par le nom de filière..."
                         className="form-control"
                         value={searchTerm}
                         InputProps={{
-                          endAdornment: (
-                            <InputAdornment position="end">
+                          startAdornment: (
+                            <InputAdornment position="start">
                               <SearchIcon />
                             </InputAdornment>
                           ),

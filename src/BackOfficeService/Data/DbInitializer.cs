@@ -22,7 +22,6 @@ public class DbInitializer
     }
     else
     {
-      // Seed Filières (Departments)
       var filières = new Filière[]
       {
                     new Filière { IdFilière = Guid.NewGuid(), NomFilière = "Informatique", Description = "Département d'informatique" },
@@ -30,9 +29,6 @@ public class DbInitializer
 
       };
       context.Filières.AddRange(filières);
-      context.SaveChanges();
-
-      // Seed Groupe (Groups)
       var groupes = new Groupe[]
       {
                     new Groupe { GroupeID = Guid.NewGuid(), NomGroupe = "Groupe A", IdFilière = filières[0].IdFilière },
@@ -40,19 +36,22 @@ public class DbInitializer
 
       };
       context.Groupes.AddRange(groupes);
-      context.SaveChanges();
 
-      // Seed Module
+
+
       var modules = new Module[]
       {
-                    new Module { ModuleId = Guid.NewGuid(), NomModule = "Module 1", IdFilière = filières[0].IdFilière },
-                    new Module { ModuleId = Guid.NewGuid(), NomModule = "Module 2", IdFilière = filières[1].IdFilière },
-
+    new Module { ModuleId = Guid.NewGuid(), NomModule = "Module 1" },
+    new Module { ModuleId = Guid.NewGuid(), NomModule = "Module 2" },
       };
       context.Modules.AddRange(modules);
-      context.SaveChanges();
-
-      // Seed Étudiant (Students)
+      var filièreModules = new FilièreModule[]
+ {
+    new FilièreModule { FilièreId = filières[0].IdFilière, ModuleId = modules[0].ModuleId },
+    new FilièreModule { FilièreId = filières[1].IdFilière, ModuleId = modules[1].ModuleId },
+ };
+     
+      context.FilièreModules.AddRange(filièreModules);
       var étudiants = new Étudiant[]
   {
     new Étudiant { EtudiantId = Guid.NewGuid(), CNE = "CNE654321", CIN = "CIN123456", Nom = "Omar", Prenom = "Hassan", Adresse = "246 Avenue Example",DateDeNaissance = new DateOnly(1995, 5, 15), LieuDeNaissance = "Rabat", Telephone = "1234567890", Email = "omar.hassan@example.com", IdGroupe = groupes[1].GroupeID },

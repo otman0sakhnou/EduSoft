@@ -3,10 +3,6 @@ import React, { useState, useEffect } from 'react'
 import {
   CCard,
   CCardBody,
-  CCardTitle,
-  CCardSubtitle,
-  CCardText,
-  CCardLink,
   CTable,
   CTableHead,
   CTableBody,
@@ -20,11 +16,10 @@ import {
   CModalBody,
   CModalFooter,
 } from '@coreui/react'
-import { reportAbsence } from '../../Actions/BackOfficeActions/AbsenceAction'
 import { addSession } from '../../Actions/BackOfficeActions/SéanceActions'
 import { getGroupes } from '../../Actions/BackOfficeActions/GroupeActions'
 import { getModules } from '../../Actions/BackOfficeActions/ModuleActions'
-import { FormHelperText, MenuItem, Select, TextField } from '@mui/material'
+import { MenuItem, Select, TextField } from '@mui/material'
 import { getStudents } from '../../Actions/BackOfficeActions/ÉtudiantActions'
 import FilterListIcon from '@mui/icons-material/FilterList'
 import EmptyFilter from '../../components/EmptyFilters'
@@ -32,6 +27,7 @@ import { toast } from 'react-hot-toast'
 import { useAuth } from 'react-oidc-context'
 export default function Component() {
   const [selectedGroup, setSelectedGroup] = useState('')
+  const [selectedGroupId, setSelectedGroupId] = useState('')
   const [selectedGroupError, setSelectedGroupError] = useState('')
   const [students, setStudents] = useState([])
   const [absentStudents, setAbsentStudents] = useState([])
@@ -49,7 +45,22 @@ export default function Component() {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
   const auth = useAuth()
   const accessToken = auth?.user?.access_token
-
+  const resetForm = () => {
+    setSelectedGroup('')
+    setSelectedGroupId('')
+    setSelectedGroupError('')
+    setStudents([])
+    setAbsentStudents([])
+    setDate('')
+    setDateError('')
+    setStartTime('')
+    setStartTimeError('')
+    setEndTime('')
+    setEndTimeError('')
+    setSelectedModule('')
+    setSelectedModuleError('')
+    setSelectedFiliere('')
+  }
   useEffect(() => {
     fetchGroupes()
     fetchModules()
@@ -84,6 +95,7 @@ export default function Component() {
     setSelectedGroup(selectedGroup)
     const group = groupes.find((groupe) => groupe.nomGroupe === selectedGroup)
     if (group) {
+      setSelectedGroupId(group.groupeID)
       setSelectedFiliere(group.nomFilière)
     }
   }
@@ -91,12 +103,10 @@ export default function Component() {
   const handleModuleChange = (event) => {
     setSelectedModule(event.target.value)
   }
-  const handleAbsentChange = (student) => {
-    const absentIndex = absentStudents.findIndex(
-      (absentStudent) => absentStudent.id === student.etudiantId,
-    )
+  const handleAbsentChange = (studentId) => {
+    const absentIndex = absentStudents.findIndex((absentStudentId) => absentStudentId === studentId)
     if (absentIndex === -1) {
-      setAbsentStudents([...absentStudents, student])
+      setAbsentStudents([...absentStudents, studentId])
     } else {
       const updatedAbsentStudents = [...absentStudents]
       updatedAbsentStudents.splice(absentIndex, 1)
@@ -130,35 +140,20 @@ export default function Component() {
   }
   const confirmSignaler = async () => {
     try {
-      await Promise.all(
-        absentStudents.map(async (student) => {
-          let fullName = ''
-          if (student.nom && student.prenom) {
-            fullName = `${student.nom} ${student.prenom}`
-          }
-          await reportAbsence(
-            {
-              NomÉtudiant: fullName,
-              NomGroupe: selectedGroup,
-              NomModule: selectedModule,
-              DateAbsence: date,
-            },
-            accessToken,
-          )
-        }),
-      )
       await addSession(
         {
-          NomGroupe: selectedGroup,
-          NomModule: selectedModule,
+          GroupeId: selectedGroupId,
+          ModuleId: selectedModule,
           DateSéance: date,
           HeureDébut: startTime,
           HeureFin: endTime,
+          ÉtudiantsAbsents: absentStudents,
         },
         accessToken,
-      )
-      setAbsentStudents([])
+      ),
+        setAbsentStudents([])
       toast.success("Signalement d'absence avec succèss")
+      resetForm()
       setShowConfirmationModal(false)
     } catch (error) {
       console.error('Error signaling absence or adding session:', error)
@@ -169,9 +164,29 @@ export default function Component() {
   const filteredStudents = students.filter((student) => student.nomGroupe === selectedGroup)
   return (
     <div className="container mx-auto my-8 px-4 sm:px-6 lg:px-8">
-      <CCard style={{ maxWidth: '100%' }}>
+      <CCard
+        style={{
+          maxWidth: '100%',
+          borderRadius: '12px',
+          backgroundColor: '#f8f9fa',
+          transition: 'transform 0.3s',
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-5px)')}
+        onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
+      >
         <CCardBody>
-          <CCardHeader className="mb-3">
+          <CCardHeader
+            className="mb-3"
+            style={{
+              fontSize: '1.25rem',
+              fontWeight: 'bold',
+              color: '#343a40',
+              backgroundColor: '#e9ecef',
+              padding: '0.75rem 1.25rem',
+              borderBottom: '1px solid #dee2e6',
+              borderRadius: '12px 12px 0 0',
+            }}
+          >
             <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100 my-3">
               Signaler l'absence
             </h2>
@@ -228,9 +243,11 @@ export default function Component() {
                       Sélectionner le module
                     </MenuItem>
                     {modules
-                      .filter((module) => module.nomFilière === selectedFiliere)
+                      .filter((module) =>
+                        module.filières.some((f) => f.nomFilière === selectedFiliere),
+                      )
                       .map((module) => (
-                        <MenuItem key={module.moduleId} value={module.nomModule}>
+                        <MenuItem key={module.moduleId} value={module.moduleId}>
                           {module.nomModule}
                         </MenuItem>
                       ))}
@@ -342,7 +359,7 @@ export default function Component() {
                             <input
                               type="checkbox"
                               id={`absent-${index}`}
-                              onChange={() => handleAbsentChange(student)}
+                              onChange={() => handleAbsentChange(student.etudiantId)}
                             />
                           </td>
                         </tr>

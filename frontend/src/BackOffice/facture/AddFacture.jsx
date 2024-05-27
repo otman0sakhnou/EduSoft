@@ -4,9 +4,14 @@ import TextField from '@mui/material/TextField'
 import { toast } from 'react-hot-toast'
 import { CButton, CModal, CModalHeader, CModalTitle, CModalBody, CModalFooter } from '@coreui/react'
 import { useAuth } from 'react-oidc-context'
-import { addFacture } from '../../Actions/BackOfficeActions/FactureActions' // Adjust import as needed
+import { addFacture } from '../../Actions/BackOfficeActions/FactureActions'
 
-export default function AddFiliereDialog({ selectedProfessor, selectedMonth, totalHours }) {
+export default function AddFiliereDialog({
+  selectedProfessor,
+  selectedYear,
+  selectedMonth,
+  totalHours,
+}) {
   const [open, setOpen] = useState(false)
   const [montantParHeure, setMontantParHeure] = useState('')
   const [montantParHeureError, setMontantParHeureError] = useState(false)
@@ -20,8 +25,8 @@ export default function AddFiliereDialog({ selectedProfessor, selectedMonth, tot
   const handleClose = () => {
     setOpen(false)
   }
-
   const handleSaveInvoice = async () => {
+    console.log(totalHours)
     let hasError = false
     if (!montantParHeure || isNaN(montantParHeure) || parseFloat(montantParHeure) <= 0) {
       setMontantParHeureError(true)
@@ -31,18 +36,19 @@ export default function AddFiliereDialog({ selectedProfessor, selectedMonth, tot
     }
 
     if (hasError) return
-
     try {
       setOpen(false)
       await addFacture(
         {
           NomProfesseur: selectedProfessor,
+          Année: selectedYear,
           Mois: selectedMonth,
           MontantParHeure: parseFloat(montantParHeure),
           TotalHeures: totalHours,
         },
         accessToken,
       )
+      console.log(totalHours)
       toast.success('Facture ajoutée avec succès')
     } catch (error) {
       console.error('Error creating invoice:', error)
@@ -151,6 +157,7 @@ export default function AddFiliereDialog({ selectedProfessor, selectedMonth, tot
 
 AddFiliereDialog.propTypes = {
   selectedProfessor: PropTypes.string.isRequired,
+  selectedYear: PropTypes.string.isRequired,
   selectedMonth: PropTypes.string.isRequired,
-  totalHours: PropTypes.number.isRequired,
+  totalHours: PropTypes.string.isRequired,
 }

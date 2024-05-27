@@ -4,14 +4,14 @@ namespace BackOfficeService;
 
 public class ReqSéanceDto
 {
- 
+
   public string NomProfesseur { get; set; }
 
-  [Required(ErrorMessage = "Le nom du groupe est requis.")]
-  public string NomGroupe { get; set; }
+  [Required(ErrorMessage = "Le groupe ID est requis.")]
+  public Guid GroupeId { get; set; }
 
-  [Required(ErrorMessage = "Le nom du module est requis.")]
-  public string NomModule { get; set; }
+  [Required(ErrorMessage = "Le module ID est requis.")]
+  public Guid ModuleId { get; set; }
 
   [Required(ErrorMessage = "La date de séance est requise.")]
   public DateOnly DateSéance { get; set; }
@@ -21,4 +21,5 @@ public class ReqSéanceDto
 
   [Required(ErrorMessage = "L'heure de fin est requise.")]
   public string HeureFin { get; set; }
+  public List<Guid> ÉtudiantsAbsents { get; set; }
 }

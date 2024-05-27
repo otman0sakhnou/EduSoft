@@ -23,11 +23,13 @@ import SearchIcon from '@mui/icons-material/Search'
 import { InputAdornment, TextField } from '@mui/material'
 import { getModules } from '../../Actions/BackOfficeActions/ModuleActions'
 import { deleteModule } from '../../Actions/BackOfficeActions/ModuleActions'
+import { DeleteAssociation } from '../../Actions/BackOfficeActions/ModuleActions'
 import AddModuleDialog from './AddModule'
 import toast from 'react-hot-toast'
 import UpdateModule from './UpdateModule'
 import DeleteRounded from '@mui/icons-material/DeleteRounded'
 import BlurOnRounded from '@mui/icons-material/BlurOnRounded'
+import CloseIcon from '@mui/icons-material/Close'
 
 export default function Module() {
   const [modules, setModules] = useState([])
@@ -72,6 +74,27 @@ export default function Module() {
       setVisible(false)
     }
   }
+
+  const handleDeleteAssociation = async (module, filiereId) => {
+    try {
+      const success = await DeleteAssociation(module.moduleId, filiereId)
+      if (success) {
+        const updatedModules = await getModules()
+        const updatedModule = updatedModules.find((mod) => mod.moduleId === module.moduleId)
+        if (updatedModule && updatedModule.filières.length === 0) {
+          await deleteModule(updatedModule.moduleId)
+          toast.success('Association supprimée avec succès')
+          toast.success('Module supprimé avec succès')
+        } else {
+          toast.success('Association supprimée avec succès')
+        }
+        fetchModules()
+      }
+    } catch (error) {
+      console.log('Error deleting Module:', error)
+      toast.error("Échec de la suppression de l'association")
+    }
+  }
   const filteredModules = modules.filter((module) =>
     module.nomModule.toLowerCase().includes(searchTerm.toLowerCase()),
   )
@@ -93,17 +116,32 @@ export default function Module() {
         <div className="container">
           <div className="row mb-4 align-items-center">
             <div className="col-lg-12 mb-3">
-              <CCardHeader>
+              <CCardHeader
+                style={{
+                  backgroundColor: '#e9ecef',
+                  padding: '0.75rem 1.25rem',
+                  borderBottom: '1px solid #dee2e6',
+                  borderRadius: '12px 12px 0 0',
+                }}
+              >
                 <div className="d-flex align-items-center">
-                  <h2 className="text-2xl font-bold mb-2 mx-3">Les modules disponibles</h2>
+                  <h2
+                    style={{
+                      fontWeight: 'bold',
+                      color: '#343a40',
+                    }}
+                    className="mb-2 mx-2"
+                  >
+                    Les modules disponibles
+                  </h2>
                   <div className="col-lg-8">
                     <TextField
                       type="text"
-                      label="Rechercher par le nom de module..."
+                      placeholder="Rechercher par le nom de module..."
                       className="form-control"
                       value={searchTerm}
                       InputProps={{
-                        endAdornment: (
+                        startAdornment: (
                           <InputAdornment position="end">
                             <SearchIcon />
                           </InputAdornment>
@@ -135,11 +173,6 @@ export default function Module() {
                 </CTableHeaderCell>
                 <CTableHeaderCell
                   style={{ backgroundColor: '#57A6A1', color: 'white', fontWeight: 'bold' }}
-                >
-                  Description du Filière
-                </CTableHeaderCell>
-                <CTableHeaderCell
-                  style={{ backgroundColor: '#57A6A1', color: 'white', fontWeight: 'bold' }}
                   className="text-center"
                 >
                   {' '}
@@ -151,8 +184,27 @@ export default function Module() {
               {currentItems.map((module) => (
                 <CTableRow key={module.moduleId}>
                   <CTableDataCell>{module.nomModule}</CTableDataCell>
-                  <CTableDataCell>{module.nomFilière}</CTableDataCell>
-                  <CTableDataCell>{module.description}</CTableDataCell>
+                  <CTableDataCell>
+                    {module.filières.map((filière, index) => (
+                      <span
+                        style={{
+                          backgroundColor: '#57A6A1',
+                          color: 'white',
+                          borderRadius: '5px',
+                          padding: '2px 6px',
+                          marginRight: '5px',
+                          display: 'inline-block',
+                        }}
+                        key={index}
+                      >
+                        {filière.nomFilière}
+                        <CloseIcon
+                          sx={{ fontSize: 20, marginLeft: '5px', cursor: 'pointer' }}
+                          onClick={() => handleDeleteAssociation(module, filière.idFilière)}
+                        />
+                      </span>
+                    ))}
+                  </CTableDataCell>
                   <CTableDataCell className="text-center">
                     <UpdateModule module={module} fetchModules={fetchModules} />
                     <DeleteRounded

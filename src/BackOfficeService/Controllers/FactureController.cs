@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace BackOfficeService;
 
@@ -17,16 +18,21 @@ public class FactureController : ControllerBase
     _mapper = mapper;
   }
 
-  [HttpGet("{nomProfesseur}")]
-  public async Task<ActionResult<IEnumerable<RespFacture>>> GetFacturesByProfesseur(string nomProfesseur)
+  [HttpGet]
+  public async Task<ActionResult<IEnumerable<RespFacture>>> GetFactures([FromQuery] string nomProfesseur = null)
   {
-    var factures = await _backOfficeDbContext.Factures
-        .Where(f => f.NomProfesseur == nomProfesseur)
-        .ToListAsync();
+    IQueryable<Facture> query = _backOfficeDbContext.Factures;
+
+    if (!string.IsNullOrEmpty(nomProfesseur))
+    {
+      query = query.Where(f => f.NomProfesseur == nomProfesseur);
+    }
+
+    var factures = await query.ToListAsync();
 
     if (factures == null || !factures.Any())
     {
-      return NotFound($"Aucune facture n'a été trouvée pour le professeur {nomProfesseur}.");
+      return NotFound("Aucune facture n'a été trouvée.");
     }
 
     var respFactures = _mapper.Map<IEnumerable<RespFacture>>(factures);
@@ -38,31 +44,42 @@ public class FactureController : ControllerBase
   {
     try
     {
-      // Calculate total amount based on total sessions and montantParSéance
-      double totalAmount = double.Parse(reqFacture.TotalHeures) * (double)reqFacture.MontantParHeure;
-    
-      var facture = new Facture
+      TimeSpan totalDuration;
+      if (TimeSpan.TryParseExact(reqFacture.TotalHeures, "hh\\:mm", CultureInfo.InvariantCulture, out totalDuration))
       {
-        NomProfesseur = reqFacture.NomProfesseur,
-        Mois = reqFacture.Mois,
-        MontantParHeure = reqFacture.MontantParHeure,
-        TotalHeures = reqFacture.TotalHeures,
-        MontantTotale = totalAmount,
-      };
+        double totalHours = totalDuration.TotalHours;
+        decimal totalAmount = (decimal)totalHours * reqFacture.MontantParHeure;
 
-      // Add facture to database
-      _backOfficeDbContext.Factures.Add(facture);
-      await _backOfficeDbContext.SaveChangesAsync();
+        var facture = new Facture
+        {
+          NomProfesseur = reqFacture.NomProfesseur,
+          Mois = reqFacture.Mois,
+          Année = reqFacture.Année,
+          MontantParHeure = reqFacture.MontantParHeure,
+          TotalHeures = reqFacture.TotalHeures,
+          MontantTotale =(double) totalAmount 
+        };
 
-      var respFacture = _mapper.Map<RespFacture>(facture);
+        _backOfficeDbContext.Factures.Add(facture);
+        await _backOfficeDbContext.SaveChangesAsync();
 
-      return Ok(respFacture);
+        var respFacture = _mapper.Map<RespFacture>(facture);
+
+        return Ok(respFacture);
+      }
+      else
+      {
+        return BadRequest("Invalid time format for TotalHeures.");
+      }
     }
     catch (Exception ex)
     {
+      Console.WriteLine($"Error: {ex.Message}");
       return StatusCode(500, ex.Message);
     }
   }
+
+
   [HttpDelete("{factureId}")]
   public async Task<ActionResult> DeleteFacture(Guid factureId)
   {

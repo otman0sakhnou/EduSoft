@@ -1,13 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace BackOfficeService;
-
-[Table("Module")]
-public class Module
+namespace BackOfficeService
 {
-  public Guid ModuleId { get; set; }
-  public string NomModule { get; set; }
-  public Guid IdFilière { get; set; }
-  [ForeignKey("IdFilière")]
-  public Filière Filière { get; set; }
+  [Table("Module")]
+  public class Module
+  {
+    public Guid ModuleId { get; set; }
+    public string NomModule { get; set; }
+    public ICollection<FilièreModule> FilièreModules { get; set; }
+    public ICollection<Séance> Séances { get; set; }
+  }
 }

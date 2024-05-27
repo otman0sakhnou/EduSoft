@@ -3,8 +3,18 @@ import React, { useState, useEffect } from 'react'
 import { getUsers } from '../Actions/UserActions/getUsers'
 import Avatar from '@mui/material/Avatar'
 import Stack from '@mui/material/Stack'
-import { Grid, Typography, TextField } from '@mui/material'
-import { CCardBody, CCard, CCardHeader, CPagination, CPaginationItem } from '@coreui/react'
+import { Typography, TextField } from '@mui/material'
+import {
+  CCardBody,
+  CCard,
+  CCardHeader,
+  CPagination,
+  CPaginationItem,
+  CRow,
+  CCol,
+} from '@coreui/react'
+import CIcon from '@coreui/icons-react'
+import { cilSearch } from '@coreui/icons'
 
 function UserList() {
   const [users, setUsers] = useState([])
@@ -27,8 +37,6 @@ function UserList() {
   function stringToColor(string) {
     let hash = 0
     let i
-
-    /* eslint-disable no-bitwise */
     for (i = 0; i < string.length; i += 1) {
       hash = string.charCodeAt(i) + ((hash << 5) - hash)
     }
@@ -39,7 +47,6 @@ function UserList() {
       const value = (hash >> (i * 8)) & 0xff
       color += `00${value.toString(16)}`.slice(-2)
     }
-    /* eslint-enable no-bitwise */
 
     return color
   }
@@ -64,7 +71,9 @@ function UserList() {
     <CCard className="shadow-lg">
       <CCardBody>
         <CCardHeader className="d-flex justify-content-between align-items-center mb-4">
-          <h1 className="text-2xl font-bold">Gestion des utilisateurs</h1>
+          <Typography variant="h4" className="text-2xl font-bold">
+            Gestion des utilisateurs
+          </Typography>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <TextField
               id="search"
@@ -73,17 +82,23 @@ function UserList() {
               size="small"
               onChange={handleSearch}
               style={{ maxWidth: '100%' }}
+              InputProps={{
+                endAdornment: <CIcon content={cilSearch} />,
+              }}
             />
           </div>
         </CCardHeader>
-        <Grid container spacing={2}>
+        <CRow>
           {currentUsers.map((user, index) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+            <CCol xs={12} sm={6} md={4} lg={3} key={index}>
               <CCard
+                className="mb-4 shadow-lg"
                 style={{
-                  boxShadow: '0 10px 10px rgba(0,0,0,0.3)',
-                  marginBottom: '20px',
+                  transition: 'transform 0.3s',
+                  borderRadius: '20px',
                 }}
+                onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
+                onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
               >
                 <CCardBody>
                   <Stack direction="row" spacing={2} alignItems="center">
@@ -91,27 +106,27 @@ function UserList() {
                       {user.userName.charAt(0)}
                     </Avatar>
                     <div>
-                      <Typography variant="h6">{user.fullName}</Typography>
-                      <Typography variant="body1">{user.email}</Typography>
+                      <Typography variant="h6" style={{ fontWeight: 'bold' }}>
+                        {user.fullName}
+                      </Typography>
+                      <Typography variant="body2">{user.email}</Typography>
                     </div>
                   </Stack>
-                  <div style={{ display: 'flex', flexDirection: 'row' }}>
-                    <Typography variant="body3">Nom d'utilisateur: {user.userName}</Typography>
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'row' }}>
-                    <Typography variant="body3">Rôle : {user.roleName}</Typography>
+                  <div style={{ marginTop: '10px' }}>
+                    <Typography variant="body2">Nom d'utilisateur: {user.userName}</Typography>
+                    <Typography variant="body2">Rôle: {user.roleName}</Typography>
                   </div>
                 </CCardBody>
               </CCard>
-            </Grid>
+            </CCol>
           ))}
-        </Grid>
+        </CRow>
         <CPagination
           aria-label="Page navigation example"
           activePage={currentPage}
           pages={totalPages}
           onActivePageChange={changePage}
-          className="d-flex justify-content-center"
+          className="d-flex justify-content-center mt-4"
         >
           <CPaginationItem
             aria-label="Previous"

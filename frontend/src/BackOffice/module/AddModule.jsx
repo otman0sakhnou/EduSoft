@@ -2,20 +2,22 @@ import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { CButton, CModal, CModalHeader, CModalTitle, CModalBody, CModalFooter } from '@coreui/react'
 import TextField from '@mui/material/TextField'
-import Select from '@mui/material/Select'
-import MenuItem from '@mui/material/MenuItem'
 import { createModule } from '../../Actions/BackOfficeActions/ModuleActions'
 import { getFilières } from '../../Actions/BackOfficeActions/FilièreActions'
 import { toast } from 'react-hot-toast'
-import { Fab } from '@mui/material'
-import AddIcon from '@mui/icons-material/Add'
+import Select from 'react-select'
+import makeAnimated from 'react-select/animated'
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
+
+const animatedComponents = makeAnimated()
 
 export default function AddModuleDialog({ fetchModules }) {
   const [moduleName, setModuleName] = useState('')
-  const [filièreId, setFilièreId] = useState('')
+  const [filièreIds, setFilièreIds] = useState([])
   const [filières, setFilières] = useState([])
   const [moduleNameError, setModuleNameError] = useState(false)
   const [filièreError, setFilièreError] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
@@ -38,13 +40,14 @@ export default function AddModuleDialog({ fetchModules }) {
   const handleClose = () => {
     setOpen(false)
   }
+
   const handleSaveModule = async () => {
     let hasError = false
     if (!moduleName || !/^[A-Za-z\séÉ]+$/.test(moduleName)) {
       setModuleNameError(true)
       hasError = true
     }
-    if (!filièreId) {
+    if (filièreIds.length === 0) {
       setFilièreError(true)
       hasError = true
     }
@@ -52,7 +55,7 @@ export default function AddModuleDialog({ fetchModules }) {
 
     try {
       setOpen(false)
-      await createModule({ nomModule: moduleName, idFilière: filièreId })
+      await createModule({ nomModule: moduleName, FilièreIds: filièreIds })
       fetchModules()
       toast.success('Module créé avec succès')
     } catch (error) {
@@ -116,27 +119,26 @@ export default function AddModuleDialog({ fetchModules }) {
                 }}
               />
               <Select
-                value={filièreId}
-                onChange={(e) => {
-                  setFilièreId(e.target.value)
-                  setFilièreError(false)
-                }}
-                displayEmpty
-                fullWidth
-                margin="dense"
-                variant="outlined"
+                closeMenuOnSelect={false}
+                components={animatedComponents}
+                isMulti
                 error={filièreError}
                 placeholder="Sélectionner la filière"
-              >
-                <MenuItem value="" disabled>
-                  Sélectionner la filière
-                </MenuItem>
-                {filières.map((filière) => (
-                  <MenuItem key={filière.idFilière} value={filière.idFilière}>
-                    {filière.nomFilière}
-                  </MenuItem>
-                ))}
-              </Select>
+                isLoading={isLoading}
+                onChange={(selectedOptions) => {
+                  setFilièreIds(selectedOptions.map((option) => option.value))
+                  setFilièreError(selectedOptions.length === 0)
+                }}
+                options={filières.map((filière) => ({
+                  value: filière.idFilière,
+                  label: filière.nomFilière,
+                }))}
+              />
+              {filièreError && (
+                <span style={{ color: 'red', fontSize: '0.75rem' }}>
+                  <ErrorOutlineIcon /> Sélectionnez au moins une filière.
+                </span>
+              )}
             </div>
           </div>
         </CModalBody>

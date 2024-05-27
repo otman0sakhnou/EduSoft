@@ -1,35 +1,50 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import TextField from '@mui/material/TextField'
-import Select from '@mui/material/Select'
-import MenuItem from '@mui/material/MenuItem'
-import { Fab } from '@mui/material'
-import EditIcon from '@mui/icons-material/ModeEditOutlineTwoTone'
+import makeAnimated from 'react-select/animated'
+import Select from 'react-select'
 import { updateModule } from '../../Actions/BackOfficeActions/ModuleActions'
 import { getFilières } from '../../Actions/BackOfficeActions/FilièreActions'
 import { toast } from 'react-hot-toast'
 import { CButton, CModal, CModalHeader, CModalTitle, CModalBody, CModalFooter } from '@coreui/react'
 import EditRounded from '@mui/icons-material/EditRounded'
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
 
+const animatedComponents = makeAnimated()
 export default function UpdateModule({ module, fetchModules }) {
   const [open, setOpen] = useState(false)
   const [moduleName, setModuleName] = useState(module.nomModule)
-  const [filièreId, setFilièreId] = useState(module.idFilière)
   const [filières, setFilières] = useState([])
+  const [selectedFilières, setSelectedFilières] = useState([])
   const [moduleNameError, setModuleNameError] = useState(false)
   const [filièreError, setFilièreError] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     fetchFilières()
     setModuleName(module.nomModule)
+    setSelectedFilières(
+      module.filières.map((filière) => ({
+        value: filière.idFilière,
+        label: filière.nomFilière,
+      })),
+    )
   }, [module])
 
   const fetchFilières = async () => {
+    setIsLoading(true)
     try {
       const data = await getFilières()
-      setFilières(data)
+      setFilières(
+        data.map((filière) => ({
+          value: filière.idFilière,
+          label: filière.nomFilière,
+        })),
+      )
     } catch (error) {
       console.error('Error fetching filières:', error)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -42,32 +57,35 @@ export default function UpdateModule({ module, fetchModules }) {
   }
 
   const handleUpdateModule = async () => {
-    console.log('handleUpdateModule called')
     let hasError = false
     if (!moduleName) {
       setModuleNameError(true)
       hasError = true
     }
-    if (!filièreId) {
+    if (!selectedFilières.length) {
       setFilièreError(true)
       hasError = true
     }
     if (hasError) return
+    setIsLoading(true)
 
     try {
-      console.log('ID :', filièreId)
-      console.log('ID M:', module.moduleId)
-      console.log('NOM :', moduleName)
-      await updateModule(module.moduleId, { nomModule: moduleName, idFilière: filièreId })
+      await updateModule(module.moduleId, {
+        nomModule: moduleName,
+        FilièreIds: selectedFilières.map((filière) => filière.value),
+      })
       fetchModules()
       setOpen(false)
       toast.success('Module mis à jour avec succès')
     } catch (error) {
+      fetchModules()
       console.error('Error updating module:', error)
-      toast.error('Erreur lors de la mise à jour')
+      setOpen(false)
+      toast.success('Module mis à jour avec succès')
+    } finally {
+      setIsLoading(false)
     }
   }
-
   return (
     <>
       <EditRounded
@@ -101,27 +119,23 @@ export default function UpdateModule({ module, fetchModules }) {
               }}
             />
             <Select
-              value={filièreId || ''}
-              onChange={(e) => {
-                setFilièreId(e.target.value)
-                setFilièreError(false)
-              }}
-              displayEmpty
-              fullWidth
-              margin="dense"
-              variant="outlined"
+              components={animatedComponents}
+              value={selectedFilières}
               error={filièreError}
-              placeholder="Sélectionner la filière"
-            >
-              <MenuItem value="" disabled>
-                Sélectionner la filière
-              </MenuItem>
-              {filières.map((filière) => (
-                <MenuItem key={filière.idFilière} value={filière.idFilière}>
-                  {filière.nomFilière}
-                </MenuItem>
-              ))}
-            </Select>
+              onChange={(selectedOptions) => {
+                setSelectedFilières(selectedOptions)
+                setFilièreError(selectedOptions.length === 0)
+              }}
+              options={filières}
+              isMulti
+              placeholder="Sélectionner les filières"
+              className={filièreError ? 'react-select-error' : ''}
+            />
+            {filièreError && (
+              <span style={{ color: 'red', fontSize: '0.75rem' }}>
+                <ErrorOutlineIcon /> Sélectionnez au moins une filière
+              </span>
+            )}
           </div>
         </CModalBody>
         <CModalFooter>

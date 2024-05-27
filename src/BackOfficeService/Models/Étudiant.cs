@@ -15,9 +15,9 @@ public class Étudiant
     public string Adresse { get; set; }
     public string Telephone { get; set; }
     public string Email { get; set; }
-    public Guid IdGroupe { get; set; }
     public DateOnly? DateDeNaissance { get; set; }
     public string LieuDeNaissance { get; set; }
+    public Guid IdGroupe { get; set; }
 
     [ForeignKey("IdGroupe")]
     public Groupe Groupe { get; set; }

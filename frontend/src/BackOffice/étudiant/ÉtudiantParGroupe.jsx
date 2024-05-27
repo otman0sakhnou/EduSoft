@@ -112,10 +112,15 @@ export default function ÉtudiantParGroupe() {
     setSearchTerm(e.target.value)
   }
   const handleUpload = async () => {
-    if (!selectedFile || !groupeId) {
-      toast.error('Veuillez sélectionner un fichier Excel et un groupe.')
+    if (!groupeId) {
+      toast.error('Veuillez sélectionner un groupue')
       return
     }
+    if (!selectedFile) {
+      toast.error('Veuillez sélectionner un fichier Excel')
+      return
+    }
+
     const fileReader = new FileReader()
     fileReader.onload = async (e) => {
       const data = new Uint8Array(e.target.result)
@@ -133,11 +138,7 @@ export default function ÉtudiantParGroupe() {
         'dateDeNaissance',
         'lieuDeNaissance',
       ]
-
-      // Get column names from the first row of the sheet
       const columnNames = XLSX.utils.sheet_to_json(sheet, { header: 1 })[0]
-
-      // Verify if column names match the expected ones
       const isValidColumns = expectedColumnNames.every((name) => columnNames.includes(name))
       if (!isValidColumns) {
         toast.error('Les noms de colonnes dans le fichier Excel ne correspondent pas.')
@@ -146,36 +147,72 @@ export default function ÉtudiantParGroupe() {
 
       const excelData = XLSX.utils.sheet_to_json(sheet)
 
+      let validationErrors = []
+      let validatedStudents = []
+
+      for (const student of excelData) {
+        if (
+          Object.values(student).some(
+            (value) => value === null || value === undefined || value === '',
+          )
+        ) {
+          validationErrors.push("Les données de l'étudiant dans le fichier Excel sont incomplètes.")
+          continue
+        }
+
+        const dobExcel = student.dateDeNaissance
+        const dobJSDate = XLSX.SSF.parse_date_code(dobExcel)
+        const dateDeNaissance = new Date(dobJSDate.y, dobJSDate.m - 1, dobJSDate.d)
+        const dateDeNaissanceString = dateDeNaissance.toISOString().split('T')[0]
+
+        const telephoneRegex =
+          /^(?:(?:(?:\+|00)212[\s]?(?:[\s]?\(0\)[\s]?)?)|0){1}(?:5[\s.-]?[2-3]|6[\s.-]?[13-9]|7[\s.-]?[13-9]|8[\s.-]?[13-9]){1}[0-9]{1}(?:[\s.-]?\d{2}){3}$/
+        if (!telephoneRegex.test(student.telephone)) {
+          validationErrors.push(
+            `Le téléphone doit être valide pour l'étudiant ${student.nom} ${student.prenom}.`,
+          )
+          continue
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        if (!emailRegex.test(student.email)) {
+          validationErrors.push(
+            `L'email doit être valide pour l'étudiant ${student.nom} ${student.prenom}.`,
+          )
+          continue
+        }
+
+        const dateRegex = /^\d{4}-\d{2}-\d{2}$/
+        if (!dateRegex.test(dateDeNaissanceString)) {
+          validationErrors.push(
+            `La date de naissance doit être au format AAAA-MM-JJ pour l'étudiant ${student.nom} ${student.prenom}.`,
+          )
+          continue
+        }
+        validatedStudents.push({
+          cne: student.cne,
+          cin: student.cin,
+          nom: student.nom,
+          prenom: student.prenom,
+          adresse: student.adresse,
+          telephone: student.telephone,
+          email: student.email,
+          dateDeNaissance: dateDeNaissanceString,
+          lieuDeNaissance: student.lieuDeNaissance,
+        })
+      }
+
+      if (validationErrors.length > 0) {
+        validationErrors.forEach((error) => toast.error(error))
+        return
+      }
       try {
         setLoading(true)
-        for (const student of excelData) {
-          if (
-            Object.values(student).some(
-              (value) => value === null || value === undefined || value === '',
-            )
-          ) {
-            toast.error("Les données de l'étudiant dans le fichier Excel sont incomplètes.")
-            setLoading(false)
-            return
-          }
-          const dobExcel = student.dateDeNaissance
-          const dobJSDate = XLSX.SSF.parse_date_code(dobExcel)
-          const dateDeNaissance = new Date(dobJSDate.y, dobJSDate.m - 1, dobJSDate.d)
-          const dateDeNaissanceString = dateDeNaissance.toISOString().split('T')[0]
-          console.log('Student data before creation:', groupeId)
+        for (const student of validatedStudents) {
           await createStudent({
-            cne: student.cne,
-            cin: student.cin,
-            nom: student.nom,
-            prenom: student.prenom,
-            adresse: student.adresse,
-            telephone: student.telephone,
-            email: student.email,
-            dateDeNaissance: dateDeNaissanceString,
-            lieuDeNaissance: student.lieuDeNaissance,
+            ...student,
             idGroupe: groupeId,
           })
-          console.log('Student created successfully:', student)
         }
         setLoading(false)
         toast.success('Les étudiants ont été importés avec succès.')
@@ -186,6 +223,7 @@ export default function ÉtudiantParGroupe() {
         setLoading(false)
       }
     }
+
     fileReader.readAsArrayBuffer(selectedFile)
   }
 
@@ -208,7 +246,7 @@ export default function ÉtudiantParGroupe() {
       console.error('Error deleting Étudiant:', error)
       toast.error("Échec de la suppression d'étudiant")
     } finally {
-      setVisible(false)
+      setDeleteModalVisible(false)
     }
   }
   const handleOpenModal = () => {
@@ -225,22 +263,37 @@ export default function ÉtudiantParGroupe() {
   const hasPreviousPage = currentPage > 1
   return (
     <>
-      <CCard className="container mx-auto my-8 px-4 sm:px-6 lg:px-8 shadow-lg">
-        <CCardHeader>
-          <CRow className="align-items-center mt-3">
+      <CCard className="container mx-auto my-8 pt-3 px-4 sm:px-6 lg:px-8 shadow-lg">
+        <CCardHeader
+          style={{
+            backgroundColor: '#e9ecef',
+            padding: '0.75rem 1.25rem',
+            borderBottom: '1px solid #dee2e6',
+            borderRadius: '12px 12px 0 0',
+          }}
+        >
+          <CRow className="align-items-center mt-2">
             <CCol>
-              <h2 className="text-2xl font-bold mb-2">La liste des étudiants de {nomGroupe}</h2>
+              <h2
+                style={{
+                  fontWeight: 'bold',
+                  color: '#343a40',
+                }}
+                className="mb-2 mx-3"
+              >
+                La liste des étudiants de {nomGroupe}
+              </h2>
             </CCol>
             <CCol>
               <TextField
                 type="text"
-                label="Rechercher par le nom d'étudiant"
+                placeholder="Rechercher par le nom d'étudiant"
                 className="form-control"
                 value={searchTerm}
                 onChange={handleSearch}
                 InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
+                  startAdornment: (
+                    <InputAdornment position="start">
                       <SearchIcon />
                     </InputAdornment>
                   ),
@@ -406,7 +459,7 @@ export default function ÉtudiantParGroupe() {
         </CCardBody>
       </CCard>
       <div className="mt-4"></div>
-
+      <CCard className="mb-4"></CCard>
       <CCard className="items-center text-center shadow-lg mt-10">
         <CCardHeader>
           <h4>Importer des étudiants</h4>

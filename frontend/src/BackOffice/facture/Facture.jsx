@@ -22,19 +22,34 @@ import {
 } from '@coreui/react'
 import SearchIcon from '@mui/icons-material/Search'
 import { getAllFactures, deleteFacture } from '../../Actions/BackOfficeActions/FactureActions'
+import { getSeancesByProfessorAndDate } from '../../Actions/BackOfficeActions/SéanceActions'
+import { getModuleById } from '../../Actions/BackOfficeActions/ModuleActions'
+import { getGroupeById } from '../../Actions/BackOfficeActions/GroupeActions'
 import toast from 'react-hot-toast'
 import DeleteRounded from '@mui/icons-material/DeleteRounded'
 import BlurOnRounded from '@mui/icons-material/BlurOnRounded'
 import { InputAdornment, TextField } from '@mui/material'
+import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined'
+import KeyboardArrowUpOutlinedIcon from '@mui/icons-material/KeyboardArrowUpOutlined'
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
+import CloudDownloadIcon from '@mui/icons-material/CloudDownload'
+import IconButton from '@mui/material/IconButton'
+import Collapse from '@mui/material/Collapse'
+import { Typography, Box } from '@mui/material'
+import jsPDF from 'jspdf'
 
 export default function Facture() {
   const [factures, setFactures] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage] = useState(5)
   const [searchTerm, setSearchTerm] = useState('')
-  const [searchDate, setSearchDate] = useState('')
   const [visible, setVisible] = useState(false)
   const [factureID, setFactureId] = useState(null)
+  const [openCollapse, setOpenCollapse] = useState({})
+  const [seances, setSeances] = useState({})
+  const [sortOrder, setSortOrder] = useState('asc')
+  const [sortDateOrder, setSortDateOrder] = useState('asc')
 
   useEffect(() => {
     fetchFactures()
@@ -49,12 +64,48 @@ export default function Facture() {
     }
   }
 
-  const filterFactures = factures.filter((f) => {
-    const matchesName = f.nomProfesseur.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesDate = searchDate ? f.dateFacture.includes(searchDate) : true
-    return matchesName && matchesDate
-  })
+  const fetchSeances = async (nomProfesseur, year, month) => {
+    try {
+      const seancesData = await getSeancesByProfessorAndDate(nomProfesseur, year, month)
+      const seancesWithDetails = await Promise.all(
+        seancesData.map(async (seance) => {
+          const module = await getModuleById(seance.moduleId)
+          const groupe = await getGroupeById(seance.groupeId)
+          return { ...seance, module, groupe }
+        }),
+      )
+      setSeances((prevSeances) => ({
+        ...prevSeances,
+        [`${nomProfesseur}-${year}-${month}`]: seancesWithDetails,
+      }))
+    } catch (error) {
+      console.error('Error fetching seances:', error)
+    }
+  }
 
+  const handleCollapse = (nomProfesseur, year, month) => {
+    const key = `${nomProfesseur}-${year}-${month}`
+    if (openCollapse === key) {
+      setOpenCollapse(true)
+    } else {
+      setOpenCollapse(key)
+      if (!seances[key]) {
+        fetchSeances(nomProfesseur, year, month)
+      }
+    }
+  }
+  const toggleSortOrder = () => {
+    setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
+  }
+  const toggleSortDateOrder = () => {
+    setSortDateOrder(sortDateOrder === 'asc' ? 'desc' : 'asc')
+  }
+  const filterFactures = factures.filter((f) => {
+    const matchesName =
+      f.nomProfesseur && f.nomProfesseur.toLowerCase().includes(searchTerm.toLowerCase())
+
+    return matchesName
+  })
   const handleDelete = async (id) => {
     try {
       if (!id) {
@@ -84,10 +135,70 @@ export default function Facture() {
     }
     setVisible(false)
   }
+  const generatePDF = (facture) => {
+    const doc = new jsPDF()
+    doc.setFont('helvetica')
+    doc.setFontSize(18)
+    doc.setFont('helvetica', 'bold')
+    doc.setTextColor(33, 37, 41)
+    doc.text('Détails de la facture', 105, 20, null, null, 'center')
+    doc.setFontSize(12)
+    doc.setFont('helvetica', 'normal')
+    doc.setTextColor(99, 110, 114)
+    doc.text(`Géneré le: ${new Date().toLocaleDateString()}`, 105, 30, null, null, 'center')
+    doc.setLineWidth(0.5)
+    doc.line(20, 35, 190, 35)
+    doc.setFontSize(12)
+    doc.setTextColor(33, 37, 41)
+
+    const details = [
+      { label: 'Nom de Professeur :', value: facture.nomProfesseur },
+      { label: 'Date de Facture :', value: `${facture.mois} - ${facture.année}` },
+      { label: 'Montant Par Heure :', value: `${facture.montantParHeure} Dh` },
+      { label: 'Total Heures :', value: facture.totalHeures },
+      { label: 'Montant Total :', value: `${facture.montantTotale} Dh` },
+    ]
+
+    let yPosition = 45
+    details.forEach((detail) => {
+      doc.setFont('helvetica', 'bold')
+      doc.text(detail.label, 20, yPosition)
+      doc.setFont('helvetica', 'normal')
+      doc.text(detail.value, 70, yPosition)
+      yPosition += 10
+    })
+    doc.setLineWidth(0.5)
+    doc.line(20, yPosition + 5, 190, yPosition + 5)
+    doc.setFontSize(10)
+    doc.setTextColor(99, 110, 114)
+    doc.text('Généré par EduSoft', 105, 290, null, null, 'center')
+    doc.save(`facture_${facture.nomProfesseur}.pdf`)
+  }
+  const sortFacturesByDate = (a, b) => {
+    const months = {
+      janvier: 0,
+      février: 1,
+      mars: 2,
+      avril: 3,
+      mai: 4,
+      juin: 5,
+      juillet: 6,
+      août: 7,
+      septembre: 8,
+      octobre: 9,
+      novembre: 10,
+      décembre: 11,
+    }
+    const dateA = new Date(a.année, months[a.mois.toLowerCase()])
+    const dateB = new Date(b.année, months[b.mois.toLowerCase()])
+    return sortDateOrder === 'asc' ? dateA - dateB : dateB - dateA
+  }
+
+  const sortedFactures = filterFactures.sort(sortFacturesByDate)
 
   const indexOfLastItem = currentPage * itemsPerPage
   const indexOfFirstItem = indexOfLastItem - itemsPerPage
-  const currentItems = filterFactures.slice(indexOfFirstItem, indexOfLastItem)
+  const currentItems = sortedFactures.slice(indexOfFirstItem, indexOfLastItem)
   const hasNextPage = currentPage < Math.ceil(filterFactures.length / itemsPerPage)
   const hasPreviousPage = currentPage > 1
 
@@ -100,15 +211,23 @@ export default function Facture() {
               <div className="col-lg-12 mb-3">
                 <CCardHeader>
                   <div className="d-flex align-items-center">
-                    <h2 className="text-2xl font-bold mb-2 mx-5">Les factures disponibles</h2>
-                    <div className="col-sm-7 d-flex">
+                    <h2
+                      style={{
+                        fontWeight: 'bold',
+                        color: '#343a40',
+                      }}
+                      className="mb-2 mx-3"
+                    >
+                      Les factures disponibles
+                    </h2>
+                    <div className="col-sm-8 d-flex">
                       <TextField
                         type="text"
-                        label="Rechercher par le nom de proffesseur"
+                        placeholder="Rechercher par le nom de proffesseur"
                         className="form-control"
                         value={searchTerm}
                         InputProps={{
-                          endAdornment: (
+                          startAdornment: (
                             <InputAdornment position="end">
                               <SearchIcon />
                             </InputAdornment>
@@ -116,27 +235,12 @@ export default function Facture() {
                         }}
                         onChange={(e) => setSearchTerm(e.target.value)}
                       />
-                      <TextField
-                        type="date"
-                        label="Rechercher par date..."
-                        className="form-control ml-3"
-                        InputLabelProps={{
-                          shrink: true,
-                        }}
-                        value={searchDate}
-                        onChange={(e) => setSearchDate(e.target.value)}
-                        style={{ marginLeft: '16px' }}
-                      />
                     </div>
                   </div>
                 </CCardHeader>
               </div>
-
-              <div className="mt-3 mt-lg-0 text-end">
-                {/* <AddFactureDialog fetchFactures={fetchFactures} /> */}
-              </div>
             </div>
-            <CTable align="middle" className="mb-0 border" hover striped responsive>
+            <CTable align="middle" className="mb-0 border" hover responsive>
               <CTableCaption>Détails des Factures</CTableCaption>
               <CTableHead>
                 <CTableRow>
@@ -148,6 +252,14 @@ export default function Facture() {
                   <CTableHeaderCell
                     style={{ backgroundColor: '#57A6A1', color: 'white', fontWeight: 'bold' }}
                   >
+                    <IconButton
+                      size="small"
+                      className="text-white"
+                      onClick={toggleSortDateOrder}
+                      aria-label="sort"
+                    >
+                      {sortDateOrder === 'asc' ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}
+                    </IconButton>
                     Date de Facture
                   </CTableHeaderCell>
                   <CTableHeaderCell
@@ -173,31 +285,181 @@ export default function Facture() {
                   </CTableHeaderCell>
                 </CTableRow>
               </CTableHead>
-              <CTableBody hover>
-                {currentItems.map((facture) => (
-                  <CTableRow key={facture.idFacture}>
-                    <CTableDataCell style={{ fontWeight: 'bold' }}>
-                      {facture.nomProfesseur}
-                    </CTableDataCell>
-                    <CTableDataCell style={{ fontWeight: 'bold' }}>{facture.mois}</CTableDataCell>
-                    <CTableDataCell style={{ fontWeight: 'bold' }}>
-                      {facture.montantParHeure} Dh
-                    </CTableDataCell>
-                    <CTableDataCell style={{ fontWeight: 'bold' }}>
-                      {facture.totalHeures}
-                    </CTableDataCell>
-                    <CTableDataCell style={{ fontWeight: 'bold' }}>
-                      {facture.montantTotale} Dh
-                    </CTableDataCell>
-                    <CTableDataCell className="col-sm-2 text-center" style={{ fontWeight: 'bold' }}>
-                      <DeleteRounded
-                        fontSize="large"
-                        onClick={() => handleDelete(facture.factureId)}
-                        color="error"
-                      />
-                    </CTableDataCell>
-                  </CTableRow>
-                ))}
+              <CTableBody>
+                {currentItems.map((facture) => {
+                  const key = `${facture.nomProfesseur}-${facture.année}-${facture.mois}`
+                  return (
+                    <React.Fragment key={facture.idFacture}>
+                      <CTableRow>
+                        <CTableDataCell style={{ fontWeight: 'bold' }}>
+                          {facture.nomProfesseur}
+                        </CTableDataCell>
+                        <CTableDataCell style={{ fontWeight: 'bold' }}>
+                          {facture.mois} - {facture.année}
+                        </CTableDataCell>
+                        <CTableDataCell style={{ fontWeight: 'bold' }}>
+                          {facture.montantParHeure} Dh
+                        </CTableDataCell>
+                        <CTableDataCell style={{ fontWeight: 'bold' }}>
+                          {facture.totalHeures}
+                        </CTableDataCell>
+                        <CTableDataCell style={{ fontWeight: 'bold' }}>
+                          {facture.montantTotale} Dh
+                        </CTableDataCell>
+                        <CTableDataCell
+                          className="col-sm-2 text-center"
+                          style={{ fontWeight: 'bold' }}
+                        >
+                          <IconButton color="primary" onClick={() => generatePDF(facture)}>
+                            <CloudDownloadIcon />
+                          </IconButton>
+                          <IconButton color="error" onClick={() => handleDelete(facture.factureId)}>
+                            <DeleteRounded />
+                          </IconButton>
+                          <IconButton
+                            onClick={() =>
+                              handleCollapse(facture.nomProfesseur, facture.année, facture.mois)
+                            }
+                          >
+                            {openCollapse === key ? (
+                              <KeyboardArrowUpOutlinedIcon
+                                style={{
+                                  borderRadius: '50%',
+                                  color: '#FFFFFF',
+                                  background: '#57A6A1',
+                                }}
+                              />
+                            ) : (
+                              <KeyboardArrowDownOutlinedIcon
+                                style={{
+                                  borderRadius: '50%',
+                                  color: '#FFFFFF',
+                                  background: '#57A6A1',
+                                }}
+                              />
+                            )}
+                          </IconButton>
+                        </CTableDataCell>
+                      </CTableRow>
+                      <CTableRow>
+                        <CTableDataCell colSpan="6" style={{ paddingBottom: 0, paddingTop: 0 }}>
+                          <Collapse in={openCollapse === key} timeout="auto" unmountOnExit>
+                            <Box margin={1}>
+                              <Typography
+                                variant="h6"
+                                style={{
+                                  fontWeight: 'bold',
+                                  color: '#343a40',
+                                }}
+                                gutterBottom
+                                component="div"
+                              >
+                                Les séances effectuées :
+                              </Typography>
+                              <CTable className="border" size="small" aria-label="purchases">
+                                <CTableHead>
+                                  <CTableRow>
+                                    <CTableHeaderCell
+                                      style={{
+                                        backgroundColor: '#57A6A1',
+                                        color: 'white',
+                                        fontWeight: 'bold',
+                                      }}
+                                      onClick={toggleSortOrder}
+                                    >
+                                      <IconButton
+                                        className="text-white"
+                                        size="small"
+                                        onClick={toggleSortOrder}
+                                        aria-label="sort"
+                                      >
+                                        {sortOrder === 'asc' ? (
+                                          <ArrowUpwardIcon />
+                                        ) : (
+                                          <ArrowDownwardIcon />
+                                        )}
+                                      </IconButton>
+                                      Date
+                                    </CTableHeaderCell>
+                                    <CTableHeaderCell
+                                      style={{
+                                        backgroundColor: '#57A6A1',
+                                        color: 'white',
+                                        fontWeight: 'bold',
+                                      }}
+                                    >
+                                      Heure Début
+                                    </CTableHeaderCell>
+                                    <CTableHeaderCell
+                                      style={{
+                                        backgroundColor: '#57A6A1',
+                                        color: 'white',
+                                        fontWeight: 'bold',
+                                      }}
+                                    >
+                                      Heure Fin
+                                    </CTableHeaderCell>
+                                    <CTableHeaderCell
+                                      style={{
+                                        backgroundColor: '#57A6A1',
+                                        color: 'white',
+                                        fontWeight: 'bold',
+                                      }}
+                                    >
+                                      Nom de module
+                                    </CTableHeaderCell>
+                                    <CTableHeaderCell
+                                      style={{
+                                        backgroundColor: '#57A6A1',
+                                        color: 'white',
+                                        fontWeight: 'bold',
+                                      }}
+                                    >
+                                      Nom de groupe
+                                    </CTableHeaderCell>
+                                  </CTableRow>
+                                </CTableHead>
+                                <CTableBody>
+                                  {seances[key] ? (
+                                    seances[key]
+                                      .sort((a, b) => {
+                                        const dateA = new Date(a.dateSéance)
+                                        const dateB = new Date(b.dateSéance)
+                                        return sortOrder === 'asc' ? dateA - dateB : dateB - dateA
+                                      })
+                                      .map((seance) => (
+                                        <CTableRow key={seance.id}>
+                                          <CTableDataCell scope="row">
+                                            {seance.dateSéance}
+                                          </CTableDataCell>
+                                          <CTableDataCell scope="row">
+                                            {seance.heureDébut}
+                                          </CTableDataCell>
+                                          <CTableDataCell scope="row">
+                                            {seance.heureFin}
+                                          </CTableDataCell>
+                                          <CTableDataCell scope="row">
+                                            {seance.module.nomModule}
+                                          </CTableDataCell>
+                                          <CTableDataCell scope="row">
+                                            {seance.groupe.nomGroupe}
+                                          </CTableDataCell>
+                                        </CTableRow>
+                                      ))
+                                  ) : (
+                                    <CTable className="text-center">
+                                      <CTableBody colSpan="4">Aucune séance</CTableBody>
+                                    </CTable>
+                                  )}
+                                </CTableBody>
+                              </CTable>
+                            </Box>
+                          </Collapse>
+                        </CTableDataCell>
+                      </CTableRow>
+                    </React.Fragment>
+                  )
+                })}
               </CTableBody>
             </CTable>
             <div className="d-flex justify-content-center">

@@ -1,12 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
-namespace BackOfficeService;
-
-public class CreateModuleDto
+namespace BackOfficeService
 {
-  [Required(ErrorMessage = "Le nom du module est requis.")]
-  public string NomModule { get; set; }
+  public class CreateModuleDto
+  {
+    [Required(ErrorMessage = "Le nom du module est requis")]
+    public string NomModule { get; set; }
 
-  [Required(ErrorMessage = "L'ID de la filière est requis.")]
-  public Guid IdFilière { get; set; }
+    [Required(ErrorMessage = "Au moins une filière doit être sélectionnée")]
+    public List<Guid> FilièreIds { get; set; }
+  }
 }

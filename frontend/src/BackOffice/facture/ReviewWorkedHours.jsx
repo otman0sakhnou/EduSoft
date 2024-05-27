@@ -13,8 +13,7 @@ export default function Component() {
   const [nameError, setNameError] = useState(false)
 
   useEffect(() => {
-    // You can put any logic here that you want to run when the component mounts
-    // For example, you can fetch initial data or perform some initialization
+    getHoursWorked()
   }, [])
 
   const handleGetHoursWorked = async () => {
@@ -40,10 +39,19 @@ export default function Component() {
       setSchedule(data)
     } catch (error) {
       console.error('Error fetching data:', error)
-      // Handle error appropriately
     }
   }
+  const convertToTimeSpanFormat = (totalHeures) => {
+    const parts = totalHeures.split(':')
 
+    if (parts.length === 2) {
+      const hours = parseInt(parts[0])
+      const minutes = parseInt(parts[1])
+      return `${hours} heures ${minutes} minutes`
+    }
+
+    return '00 heures 00 minutes'
+  }
   return (
     <>
       <CCard>
@@ -95,29 +103,38 @@ export default function Component() {
             </CButton>
           </div>
           {schedule.length > 0 && (
-            <div className="mt-5">
+            <div>
+              <CCard className="my-4"></CCard>
               <h3>nombre total d'heures travaillées</h3>
-              {schedule.map((item, index) => (
-                <CCard key={index} className="mb-3">
-                  <CCardHeader>
-                    <strong>{item.nomProfesseur}</strong> - {item.mois}
-                  </CCardHeader>
-                  <CCardBody>
-                    <p style={{ fontSize: '30' }}>
-                      <span style={{ fontWeight: 'bold' }}>nombre total d'heures : </span>
-                      {item.totalHeures}
-                      <QueryBuilderIcon className="ml-3" color="secondary" sx={{ fontSize: 30 }} />
-                    </p>
-                    <div className="d-flex justify-content-end">
-                      <AddFacture
-                        selectedProfessor={item.nomProfesseur}
-                        selectedMonth={item.mois}
-                        totalHours={item.totalHeures}
-                      />
-                    </div>
-                  </CCardBody>
-                </CCard>
-              ))}
+              {schedule.map((item, index) => {
+                const formattedTotalHeures = convertToTimeSpanFormat(item.totalHeures)
+                return (
+                  <CCard key={index} className="mb-3">
+                    <CCardHeader>
+                      <strong>{item.nomProfesseur}</strong> - {item.mois} {item.année}
+                    </CCardHeader>
+                    <CCardBody>
+                      <p style={{ fontSize: '30' }}>
+                        <span style={{ fontWeight: 'bold' }}>nombre total d'heures : </span>
+                        {formattedTotalHeures}
+                        <QueryBuilderIcon
+                          className="mx-2"
+                          color="secondary"
+                          sx={{ fontSize: 25 }}
+                        />
+                      </p>
+                      <div className="d-flex justify-content-end">
+                        <AddFacture
+                          selectedProfessor={item.nomProfesseur}
+                          selectedYear={item.année}
+                          selectedMonth={item.mois}
+                          totalHours={item.totalHeures}
+                        />
+                      </div>
+                    </CCardBody>
+                  </CCard>
+                )
+              })}
             </div>
           )}
         </CCardBody>

@@ -101,9 +101,24 @@ export default function Groupe() {
           <div className="container">
             <div className="row mb-4 align-items-center">
               <div className="col-lg-12 mb-3">
-                <CCardHeader>
+                <CCardHeader
+                  style={{
+                    backgroundColor: '#e9ecef',
+                    padding: '0.75rem 1.25rem',
+                    borderBottom: '1px solid #dee2e6',
+                    borderRadius: '12px 12px 0 0',
+                  }}
+                >
                   <div className="d-flex align-items-center">
-                    <h2 className="text-2xl font-bold mx-3">Les groupes disponibles</h2>
+                    <h2
+                      style={{
+                        fontWeight: 'bold',
+                        color: '#343a40',
+                      }}
+                      className="mb-2 mx-3"
+                    >
+                      Les groupes disponibles
+                    </h2>
                     <div className="col-lg-8">
                       <TextField
                         type="text"
@@ -111,8 +126,8 @@ export default function Groupe() {
                         className="form-control"
                         value={searchTerm}
                         InputProps={{
-                          endAdornment: (
-                            <InputAdornment position="end">
+                          startAdornment: (
+                            <InputAdornment position="start">
                               <Search />
                             </InputAdornment>
                           ),

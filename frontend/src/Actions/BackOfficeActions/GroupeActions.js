@@ -11,6 +11,19 @@ export async function getGroupes() {
     throw error
   }
 }
+export async function getGroupeById(id) {
+  try {
+    const response = await fetch(`http://localhost:5000/api/groupe/${id}`)
+    if (!response.ok) {
+      throw new Error('Failed to fetch groupe')
+    }
+    const data = await response.json()
+    return data
+  } catch (error) {
+    console.error('Error fetching groupe:', error)
+    throw error
+  }
+}
 
 export async function createGroupe(groupe) {
   try {

@@ -4,13 +4,11 @@ import { useAuth } from 'react-oidc-context'
 import PropTypes from 'prop-types'
 
 export default function EmptyFilter({
-  title = 'No matches for this filter',
-  subtitle = 'Try changing or resetting the filter',
-  showReset,
+  title = 'Aucune correspondance pour cette rechercher',
+  subtitle = 'Essayez de changer ou de réinitialiser le filtre',
   showLogin,
 }) {
   const auth = useAuth()
-  const reset = () => {}
 
   return (
     <CRow className="h-[40vw] flex flex-col gap-2 justify-center items-center">
@@ -35,6 +33,5 @@ export default function EmptyFilter({
 EmptyFilter.propTypes = {
   title: PropTypes.string,
   subtitle: PropTypes.string,
-  showReset: PropTypes.bool,
   showLogin: PropTypes.bool,
 }

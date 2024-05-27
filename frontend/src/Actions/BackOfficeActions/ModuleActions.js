@@ -11,6 +11,19 @@ export async function getModules() {
     throw error
   }
 }
+export async function getModuleById(id) {
+  try {
+    const response = await fetch(`http://localhost:5000/api/module/${id}`)
+    if (!response.ok) {
+      throw new Error('Failed to fetch module')
+    }
+    const data = await response.json()
+    return data
+  } catch (error) {
+    console.error('Error fetching module:', error)
+    throw error
+  }
+}
 
 export async function createModule(matiere) {
   try {
@@ -67,6 +80,26 @@ export async function deleteModule(id) {
     return true
   } catch (error) {
     console.error('Erreur lors de la suppression du module:', error)
+    throw error
+  }
+}
+export async function DeleteAssociation(moduleId, filiereId) {
+  try {
+    const response = await fetch(
+      `http://localhost:5000/api/module/${moduleId}/filiere/${filiereId}`,
+      {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    )
+    if (!response.ok) {
+      throw new Error("Échec de la suppression de l'association")
+    }
+    return true
+  } catch (error) {
+    console.error('Error deleting association:', error)
     throw error
   }
 }
