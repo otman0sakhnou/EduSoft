@@ -5,7 +5,15 @@ import Fab from '@mui/material/Fab'
 import EditIcon from '@mui/icons-material/ModeEditOutlineTwoTone'
 import { updateFiliere } from '../../Actions/BackOfficeActions/FilièreActions'
 import { toast } from 'react-hot-toast'
-import { CModal, CModalHeader, CModalTitle, CModalBody, CModalFooter, CButton } from '@coreui/react'
+import {
+  CModal,
+  CModalHeader,
+  CModalTitle,
+  CModalBody,
+  CModalFooter,
+  CButton,
+  CSpinner,
+} from '@coreui/react'
 import EditRounded from '@mui/icons-material/EditRounded'
 
 export default function UpdateFiliereDialog({ filière, fetchFilières }) {
@@ -14,6 +22,7 @@ export default function UpdateFiliereDialog({ filière, fetchFilières }) {
   const [description, setDescription] = useState(filière.description)
   const [nomFiliereError, setNomFiliereError] = useState(false)
   const [descriptionError, setDescriptionError] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const handleClickOpen = () => {
     setOpen(true)
@@ -36,9 +45,10 @@ export default function UpdateFiliereDialog({ filière, fetchFilières }) {
     if (hasError) return
 
     try {
-      setOpen(false)
+      setLoading(true)
       await updateFiliere(filière.idFilière, { NomFilière, description })
       fetchFilières()
+      setLoading(false)
       setOpen(false)
       toast.success('Filière mise à jour avec succès')
     } catch (error) {
@@ -129,8 +139,13 @@ export default function UpdateFiliereDialog({ filière, fetchFilières }) {
               backgroundColor: '#007bff',
               cursor: 'pointer',
             }}
+            disabled={loading}
           >
-            Enregistrer
+            {loading ? (
+              <CSpinner as="span" size="sm" variant="grow" aria-hidden="true" />
+            ) : (
+              'Enregistrer'
+            )}
           </CButton>
           <CButton
             onClick={handleClose}

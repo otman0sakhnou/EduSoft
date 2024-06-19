@@ -1,0 +1,148 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+
+  background-image: linear-gradient(135deg, rgb(169, 169, 169), rgb(41, 41, 41)),
+    linear-gradient(
+      22.5deg,
+      rgb(84, 190, 204) 0%,
+      rgb(84, 190, 204) 19%,
+      rgb(89, 172, 188) 19%,
+      rgb(89, 172, 188) 20%,
+      rgb(94, 154, 171) 20%,
+      rgb(94, 154, 171) 22%,
+      rgb(99, 136, 155) 22%,
+      rgb(99, 136, 155) 31%,
+      rgb(105, 117, 138) 31%,
+      rgb(105, 117, 138) 33%,
+      rgb(110, 99, 122) 33%,
+      rgb(110, 99, 122) 45%,
+      rgb(115, 81, 105) 45%,
+      rgb(115, 81, 105) 51%,
+      rgb(120, 63, 89) 51%,
+      rgb(120, 63, 89) 100%
+    ),
+    linear-gradient(
+      45deg,
+      rgb(84, 190, 204) 0%,
+      rgb(84, 190, 204) 19%,
+      rgb(89, 172, 188) 19%,
+      rgb(89, 172, 188) 20%,
+      rgb(94, 154, 171) 20%,
+      rgb(94, 154, 171) 22%,
+      rgb(99, 136, 155) 22%,
+      rgb(99, 136, 155) 31%,
+      rgb(105, 117, 138) 31%,
+      rgb(105, 117, 138) 33%,
+      rgb(110, 99, 122) 33%,
+      rgb(110, 99, 122) 45%,
+      rgb(115, 81, 105) 45%,
+      rgb(115, 81, 105) 51%,
+      rgb(120, 63, 89) 51%,
+      rgb(120, 63, 89) 100%
+    );
+  background-blend-mode: overlay, overlay, normal;
+  background-position: center;
+}
+.wrapper {
+  width: 420px;
+  background: purple;
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  color: #fff;
+  border-radius: 10px;
+  padding: 30px 40px;
+  margin: auto;
+}
+.wrapper h1 {
+  font-size: 36px;
+  text-align: center;
+}
+.wrapper .input-box {
+  position: relative;
+  width: 100%;
+  height: 50px;
+  margin: 30px 0;
+}
+.input-box input {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  border: 2px solid rgba(255, 255, 255, 2);
+  border-radius: 40px;
+  font-size: 16px;
+  color: #fff;
+  padding: 20px 45px 20px 20px;
+}
+.bi {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 20px;
+}
+span .bi {
+  position: absolute;
+  right: 10px;
+  top: 40%;
+  transform: translateY(-50%);
+  font-size: 20px;
+}
+.dropdown-select {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  outline: 0;
+  border: 2px solid rgba(255, 255, 255, 2);
+  border-radius: 50px;
+  font-size: 15px;
+  color: #fff;
+  align-items: center;
+  padding: 9px 45px 20px 14px;
+}
+
+.input-box select:focus option {
+  background-color: #1640d6; 
+  color: #fff;
+}
+.input-box input::placeholder {
+  color: #ffffff;
+}
+.wrapper .form-check {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14.5px;
+  margin: -15px 0 15px;
+}
+
+.form-check input {
+  accent-color: #fff;
+  margin-right: 3px;
+}
+.wrapper .btn {
+  width: 100%;
+  height: 45%;
+  background: #fff;
+  border: none;
+  outline: none;
+  border-radius: 40px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  color: #333;
+  font-weight: 600;
+}

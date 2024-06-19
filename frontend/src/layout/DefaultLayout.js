@@ -1,12 +1,8 @@
 import React from 'react'
 import { AppContent, AppSidebar, AppFooter, AppHeader } from '../components/index'
 import { withAuthenticationRequired, useAuth } from 'react-oidc-context'
-import EmptyFilter from '../components/EmptyFilters'
-import { CCard, CCardBody } from '@coreui/react'
 
 const DefaultLayout = () => {
-  const auth = useAuth()
-  // const needsSignIn = !auth.user
   const PrivateAppContent = withAuthenticationRequired(AppContent, {
     onRedirecting: () => <div>Redirecting to the login page...</div>,
   })
@@ -24,20 +20,3 @@ const DefaultLayout = () => {
   )
 }
 export default DefaultLayout
-{
-  /* <div className="body flex-grow-1">
-{needsSignIn ? (
-  <CCard className="text-center">
-    <CCardBody>
-      <EmptyFilter
-        title={'connectez-vous'}
-        subtitle={'vous devez reconnecter'}
-        showLogin
-      />
-    </CCardBody>
-  </CCard>
-) : (
-  <PrivateAppContent />
-)}
-</div> */
-}

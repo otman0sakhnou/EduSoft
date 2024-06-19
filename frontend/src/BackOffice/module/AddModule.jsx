@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { CButton, CModal, CModalHeader, CModalTitle, CModalBody, CModalFooter } from '@coreui/react'
+import {
+  CButton,
+  CModal,
+  CModalHeader,
+  CModalTitle,
+  CModalBody,
+  CModalFooter,
+  CSpinner,
+} from '@coreui/react'
 import TextField from '@mui/material/TextField'
 import { createModule } from '../../Actions/BackOfficeActions/ModuleActions'
 import { getFilières } from '../../Actions/BackOfficeActions/FilièreActions'
@@ -19,6 +27,7 @@ export default function AddModuleDialog({ fetchModules }) {
   const [filièreError, setFilièreError] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [open, setOpen] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     fetchFilières()
@@ -43,7 +52,7 @@ export default function AddModuleDialog({ fetchModules }) {
 
   const handleSaveModule = async () => {
     let hasError = false
-    if (!moduleName || !/^[A-Za-z\séÉ]+$/.test(moduleName)) {
+    if (!moduleName) {
       setModuleNameError(true)
       hasError = true
     }
@@ -54,9 +63,11 @@ export default function AddModuleDialog({ fetchModules }) {
     if (hasError) return
 
     try {
-      setOpen(false)
+      setLoading(true)
       await createModule({ nomModule: moduleName, FilièreIds: filièreIds })
       fetchModules()
+      setLoading(false)
+      setOpen(false)
       toast.success('Module créé avec succès')
     } catch (error) {
       console.error('Error creating module:', error)
@@ -158,8 +169,13 @@ export default function AddModuleDialog({ fetchModules }) {
               backgroundColor: '#007bff',
               cursor: 'pointer',
             }}
+            disabled={loading}
           >
-            Enregistrer
+            {loading ? (
+              <CSpinner as="span" size="sm" variant="grow" aria-hidden="true" />
+            ) : (
+              'Enregistrer'
+            )}
           </CButton>
           <CButton
             onClick={handleClose}

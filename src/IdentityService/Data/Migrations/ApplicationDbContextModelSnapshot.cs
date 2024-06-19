@@ -30,6 +30,9 @@ namespace IdentityService.Data.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("integer");
 
+                    b.Property<DateTime>("AccountCreationDate")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("text");
@@ -43,6 +46,15 @@ namespace IdentityService.Data.Migrations
 
                     b.Property<string>("FullName")
                         .HasColumnType("text");
+
+                    b.Property<bool>("IsOnline")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastLoginDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("LastLogoutDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("boolean");
@@ -70,8 +82,17 @@ namespace IdentityService.Data.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
 
+                    b.Property<TimeSpan>("TimeSpentSinceLastLogin")
+                        .HasColumnType("interval");
+
+                    b.Property<TimeSpan>("TotalTimeSpent")
+                        .HasColumnType("interval");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("boolean");
+
+                    b.Property<double>("UsagePercentage")
+                        .HasColumnType("double precision");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)

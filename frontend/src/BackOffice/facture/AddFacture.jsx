@@ -2,7 +2,15 @@ import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import TextField from '@mui/material/TextField'
 import { toast } from 'react-hot-toast'
-import { CButton, CModal, CModalHeader, CModalTitle, CModalBody, CModalFooter } from '@coreui/react'
+import {
+  CButton,
+  CModal,
+  CModalHeader,
+  CModalTitle,
+  CModalBody,
+  CModalFooter,
+  CSpinner,
+} from '@coreui/react'
 import { useAuth } from 'react-oidc-context'
 import { addFacture } from '../../Actions/BackOfficeActions/FactureActions'
 
@@ -15,6 +23,7 @@ export default function AddFiliereDialog({
   const [open, setOpen] = useState(false)
   const [montantParHeure, setMontantParHeure] = useState('')
   const [montantParHeureError, setMontantParHeureError] = useState(false)
+  const [loading, setLoading] = useState(false)
   const auth = useAuth()
   const accessToken = auth?.user?.access_token
 
@@ -25,8 +34,8 @@ export default function AddFiliereDialog({
   const handleClose = () => {
     setOpen(false)
   }
+
   const handleSaveInvoice = async () => {
-    console.log(totalHours)
     let hasError = false
     if (!montantParHeure || isNaN(montantParHeure) || parseFloat(montantParHeure) <= 0) {
       setMontantParHeureError(true)
@@ -36,23 +45,26 @@ export default function AddFiliereDialog({
     }
 
     if (hasError) return
+
     try {
-      setOpen(false)
-      await addFacture(
-        {
-          NomProfesseur: selectedProfessor,
-          Année: selectedYear,
-          Mois: selectedMonth,
-          MontantParHeure: parseFloat(montantParHeure),
-          TotalHeures: totalHours,
-        },
-        accessToken,
-      )
+      setLoading(true) // Set loading state to true
       console.log(totalHours)
+      const invoiceData = {
+        NomProfesseur: selectedProfessor,
+        Année: selectedYear,
+        Mois: selectedMonth,
+        MontantParHeure: parseFloat(montantParHeure),
+        TotalHeures: totalHours,
+      }
+      console.log('Invoice Data:', invoiceData)
+      await addFacture(invoiceData, accessToken)
+      setOpen(false)
       toast.success('Facture ajoutée avec succès')
     } catch (error) {
       console.error('Error creating invoice:', error)
       toast.error("Erreur lors de l'ajout de la facture")
+    } finally {
+      setLoading(false) // Reset loading state
     }
   }
 
@@ -128,8 +140,13 @@ export default function AddFiliereDialog({
               backgroundColor: '#007bff',
               cursor: 'pointer',
             }}
+            disabled={loading}
           >
-            Enregistrer
+            {loading ? (
+              <CSpinner as="span" size="sm" variant="grow" aria-hidden="true" />
+            ) : (
+              'Enregistrer'
+            )}
           </CButton>
           <CButton
             onClick={handleClose}

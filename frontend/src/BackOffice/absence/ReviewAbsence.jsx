@@ -16,6 +16,7 @@ import {
   CFormInput,
   CButton,
   CCardFooter,
+  CPlaceholder,
 } from '@coreui/react'
 import Select from 'react-select'
 import makeAnimated from 'react-select/animated'
@@ -321,21 +322,67 @@ export default function ReviewAbsence() {
           </CRow>
           {selectedGroups.length > 0 ? (
             <CRow className="mb-4">
-              <CCol>
-                <div
-                  style={{
-                    backgroundColor: '#f8f9fa',
-                    color: '#495057',
-                    padding: '10px',
-                    borderRadius: '5px',
-                    border: '1px solid #ced4da',
-                    marginBottom: '15px',
-                    fontWeight: 'bold',
-                  }}
-                >
-                  Le diagramme initial permet d'illustrer les modules qui ont le plus grand
-                  pourcentage d'absence pour chaque ensemble.
-                </div>
+              <CCol
+                style={{
+                  transition: 'transform 0.3s ease-in-out',
+                  marginBottom: '20px',
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
+                onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+                md={12}
+              >
+                <CCard>
+                  <CCardHeader>
+                    {' '}
+                    Le diagramme initial permet d'illustrer les modules qui ont le plus grand
+                    pourcentage d'absence pour chaque ensemble.
+                  </CCardHeader>
+                  <CCardBody>
+                    <CChart
+                      style={{ borderRadius: '12px' }}
+                      type="bar"
+                      data={{
+                        labels: allModuleNames,
+                        datasets: selectedGroups.map((groupID, index) => ({
+                          label: groupIDToName[groupID],
+                          backgroundColor: colors[index],
+                          data: allModuleNames.map((moduleName) => {
+                            const module = topModules[groupID]?.find(
+                              (m) => m.moduleName === moduleName,
+                            )
+                            return module ? module.absenceCount : 0
+                          }),
+                        })),
+                      }}
+                      options={{
+                        responsive: true,
+                        plugins: {
+                          legend: {
+                            position: 'top',
+                          },
+                        },
+                        scales: {
+                          x: {
+                            grid: {
+                              color: getStyle('--cui-border-color-translucent'),
+                            },
+                            ticks: {
+                              color: getStyle('--cui-body-color'),
+                            },
+                          },
+                          y: {
+                            grid: {
+                              color: getStyle('--cui-border-color-translucent'),
+                            },
+                            ticks: {
+                              color: getStyle('--cui-body-color'),
+                            },
+                          },
+                        },
+                      }}
+                    />
+                  </CCardBody>
+                </CCard>
               </CCol>
               <CCol
                 style={{
@@ -346,113 +393,56 @@ export default function ReviewAbsence() {
                 onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
                 md={12}
               >
-                <CChart
-                  style={{ borderRadius: '12px' }}
-                  type="bar"
-                  data={{
-                    labels: allModuleNames,
-                    datasets: selectedGroups.map((groupID, index) => ({
-                      label: groupIDToName[groupID],
-                      backgroundColor: colors[index],
-                      data: allModuleNames.map((moduleName) => {
-                        const module = topModules[groupID]?.find((m) => m.moduleName === moduleName)
-                        return module ? module.absenceCount : 0
-                      }),
-                    })),
-                  }}
-                  options={{
-                    responsive: true,
-                    plugins: {
-                      legend: {
-                        position: 'top',
-                      },
-                    },
-                    scales: {
-                      x: {
-                        grid: {
-                          color: getStyle('--cui-border-color-translucent'),
+                <CCard>
+                  <CCardHeader>
+                    {' '}
+                    Le deuxième diagramme permet d'afficher le total des absences pour chaque groupe
+                    pendant le mois actuel
+                  </CCardHeader>
+                  <CCardBody>
+                    <CChart
+                      style={{ borderRadius: '12px' }}
+                      type="line"
+                      draggable={true}
+                      data={{
+                        labels: Array.from({ length: 31 }, (_, i) => i + 1),
+                        datasets: selectedGroups.map((groupID, index) => ({
+                          label: groupIDToName[groupID],
+                          borderColor: colors[index],
+                          backgroundColor: colors[index],
+                          fill: false,
+                          data: monthlyAbsences[groupID] || [],
+                        })),
+                      }}
+                      options={{
+                        responsive: true,
+                        plugins: {
+                          legend: {
+                            position: 'top',
+                          },
                         },
-                        ticks: {
-                          color: getStyle('--cui-body-color'),
+                        scales: {
+                          x: {
+                            grid: {
+                              color: getStyle('--cui-border-color-translucent'),
+                            },
+                            ticks: {
+                              color: getStyle('--cui-body-color'),
+                            },
+                          },
+                          y: {
+                            grid: {
+                              color: getStyle('--cui-border-color-translucent'),
+                            },
+                            ticks: {
+                              color: getStyle('--cui-body-color'),
+                            },
+                          },
                         },
-                      },
-                      y: {
-                        grid: {
-                          color: getStyle('--cui-border-color-translucent'),
-                        },
-                        ticks: {
-                          color: getStyle('--cui-body-color'),
-                        },
-                      },
-                    },
-                  }}
-                />
-              </CCol>
-              <CCol>
-                <div
-                  style={{
-                    backgroundColor: '#f8f9fa',
-                    color: '#495057',
-                    padding: '10px',
-                    borderRadius: '5px',
-                    border: '1px solid #ced4da',
-                    marginBottom: '15px',
-                    fontWeight: 'bold',
-                  }}
-                >
-                  Le deuxième diagramme permet d'afficher le total des absences pour chaque groupe
-                  pendant le mois actuel
-                </div>
-              </CCol>
-              <CCol
-                style={{
-                  transition: 'transform 0.3s ease-in-out',
-                  marginBottom: '20px',
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
-                onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-                md={12}
-              >
-                <CChart
-                  style={{ borderRadius: '12px' }}
-                  type="line"
-                  data={{
-                    labels: Array.from({ length: 31 }, (_, i) => i + 1),
-                    datasets: selectedGroups.map((groupID, index) => ({
-                      label: groupIDToName[groupID],
-                      borderColor: colors[index],
-                      backgroundColor: colors[index],
-                      fill: false,
-                      data: monthlyAbsences[groupID] || [],
-                    })),
-                  }}
-                  options={{
-                    responsive: true,
-                    plugins: {
-                      legend: {
-                        position: 'top',
-                      },
-                    },
-                    scales: {
-                      x: {
-                        grid: {
-                          color: getStyle('--cui-border-color-translucent'),
-                        },
-                        ticks: {
-                          color: getStyle('--cui-body-color'),
-                        },
-                      },
-                      y: {
-                        grid: {
-                          color: getStyle('--cui-border-color-translucent'),
-                        },
-                        ticks: {
-                          color: getStyle('--cui-body-color'),
-                        },
-                      },
-                    },
-                  }}
-                />
+                      }}
+                    />
+                  </CCardBody>
+                </CCard>
               </CCol>
             </CRow>
           ) : (
@@ -645,7 +635,7 @@ export default function ReviewAbsence() {
                                     lg={5}
                                   >
                                     <CChart
-                                      type="doughnut"
+                                      type="pie"
                                       data={getAbsenceDataForChart(student.etudiantId)}
                                       options={{
                                         plugins: {
@@ -653,6 +643,7 @@ export default function ReviewAbsence() {
                                             labels: {
                                               color: getStyle('--cui-body-color'),
                                             },
+                                            hoverOffset: 4,
                                           },
                                         },
                                       }}

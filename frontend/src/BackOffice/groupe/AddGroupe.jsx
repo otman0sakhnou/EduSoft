@@ -9,7 +9,15 @@ import 'react-confirm-alert/src/react-confirm-alert.css'
 import { createGroupe } from '../../Actions/BackOfficeActions/GroupeActions'
 import { getFilières } from '../../Actions/BackOfficeActions/FilièreActions'
 import { toast } from 'react-hot-toast'
-import { CButton, CModal, CModalHeader, CModalTitle, CModalBody, CModalFooter } from '@coreui/react'
+import {
+  CButton,
+  CModal,
+  CModalHeader,
+  CModalTitle,
+  CModalBody,
+  CModalFooter,
+  CSpinner,
+} from '@coreui/react'
 
 export default function AddGroupeDialog({ fetchGroupe }) {
   const [open, setOpen] = useState(false)
@@ -18,6 +26,7 @@ export default function AddGroupeDialog({ fetchGroupe }) {
   const [filières, setFilières] = useState([])
   const [groupeNameError, setGroupeNameError] = useState(false)
   const [filièreError, setFilièreError] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     fetchFilières()
@@ -53,10 +62,12 @@ export default function AddGroupeDialog({ fetchGroupe }) {
     if (hasError) return
 
     try {
-      setOpen(false)
+      setLoading(true)
       await createGroupe({ nomGroupe: groupeName, idFilière: filièreId })
       await fetchGroupe()
       toast.success('Groupe ajouté avec succès')
+      setLoading(false)
+      setOpen(false)
     } catch (error) {
       console.error('Error creating groupe:', error)
       toast.error("Erreur lors de l'ajout")
@@ -151,8 +162,13 @@ export default function AddGroupeDialog({ fetchGroupe }) {
               backgroundColor: '#007bff',
               cursor: 'pointer',
             }}
+            disabled={loading}
           >
-            Enregistrer
+            {loading ? (
+              <CSpinner as="span" size="sm" variant="grow" aria-hidden="true" />
+            ) : (
+              'Enregistrer'
+            )}
           </CButton>
           <CButton
             onClick={handleClose}

@@ -1,6 +1,5 @@
-import React from 'react'
-import classNames from 'classnames'
-
+/* eslint-disable react/no-unescaped-entities */
+import React, { useEffect, useState } from 'react'
 import {
   CAvatar,
   CButton,
@@ -27,20 +26,14 @@ import {
   cibCcPaypal,
   cibCcStripe,
   cibCcVisa,
-  cibGoogle,
-  cibFacebook,
-  cibLinkedin,
   cifBr,
   cifEs,
   cifFr,
   cifIn,
+  cifMa,
   cifPl,
   cifUs,
-  cibTwitter,
-  cilCloudDownload,
   cilPeople,
-  cilUser,
-  cilUserFemale,
 } from '@coreui/icons'
 
 import avatar1 from 'src/assets/images/avatars/1.jpg'
@@ -50,135 +43,132 @@ import avatar4 from 'src/assets/images/avatars/4.jpg'
 import avatar5 from 'src/assets/images/avatars/5.jpg'
 import avatar6 from 'src/assets/images/avatars/6.jpg'
 
-import WidgetsBrand from '../widgets/WidgetsBrand'
-import WidgetsDropdown from '../widgets/WidgetsDropdown'
-import MainChart from './MainChart'
+import { getAllFactures } from '../../Actions/BackOfficeActions/FactureActions'
+import { getGroupes } from '../../Actions/BackOfficeActions/GroupeActions'
+import { getModules } from '../../Actions/BackOfficeActions/ModuleActions'
+import { getFilières } from '../../Actions/BackOfficeActions/FilièreActions'
+import { getUsers } from '../../Actions/UserActions/getUsers'
+import { getStudents } from '../../Actions/BackOfficeActions/ÉtudiantActions'
+import { getAllSessions } from '../../Actions/BackOfficeActions/SéanceActions'
+import SalaryWidget from '../widgets/Admin/SalaryWidget'
+import FilièreWidget from '../widgets/Admin/FilièreWidget'
+import GroupeWidget from '../widgets/Admin/GroupeWidget'
+import UsersWidget from '../widgets/Admin/UsersWidget'
+import ProfessorDetailsWidget from '../widgets/Prof/ProfessorDetailsWidget'
+import chroma from 'chroma-js'
 
 const Dashboard = () => {
-  const progressExample = [
-    { title: 'Visits', value: '29.703 Users', percent: 40, color: 'success' },
-    { title: 'Unique', value: '24.093 Users', percent: 20, color: 'info' },
-    { title: 'Pageviews', value: '78.706 Views', percent: 60, color: 'warning' },
-    { title: 'New Users', value: '22.123 Users', percent: 80, color: 'danger' },
-    { title: 'Bounce Rate', value: 'Average Rate', percent: 40.15, color: 'primary' },
-  ]
+  const [enseignantCount, setEnseignantCount] = useState(0)
+  const [modulesCount, setModulesCount] = useState(0)
+  const [absencePercentage, setAbsencePercentage] = useState(0)
+  const [sessionsCount, setSessionsCount] = useState(0)
+  const [users, setUsers] = useState([])
 
-  const progressGroupExample1 = [
-    { title: 'Monday', value1: 34, value2: 78 },
-    { title: 'Tuesday', value1: 56, value2: 94 },
-    { title: 'Wednesday', value1: 12, value2: 67 },
-    { title: 'Thursday', value1: 43, value2: 91 },
-    { title: 'Friday', value1: 22, value2: 73 },
-    { title: 'Saturday', value1: 53, value2: 82 },
-    { title: 'Sunday', value1: 9, value2: 69 },
-  ]
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const users = await getUsers()
+      const enseignantCount = users.filter((user) => user.roleName === 'Enseignant').length
+      setEnseignantCount(enseignantCount)
+      setUsers(users)
+    }
 
-  const progressGroupExample2 = [
-    { title: 'Male', icon: cilUser, value: 53 },
-    { title: 'Female', icon: cilUserFemale, value: 43 },
-  ]
+    fetchUsers()
+  }, [])
+  useEffect(() => {
+    const fetchModules = async () => {
+      const modules = await getModules()
+      const modulesCount = modules.length
+      setModulesCount(modulesCount)
+    }
+    fetchModules()
+  })
+  useEffect(() => {
+    const fetchSessionsAndStudents = async () => {
+      const sessions = await getAllSessions()
+      const studentsData = await getStudents()
+      const currentWeekSessions = filterCurrentWeekSessions(sessions)
+      const { totalStudents, totalAbsences } = calculateAbsenceStats(
+        currentWeekSessions,
+        studentsData,
+      )
+      const absencePercentage =
+        totalStudents > 0 ? ((totalAbsences / totalStudents) * 100).toFixed(2) : 0
+      setAbsencePercentage(absencePercentage)
+      setSessionsCount(currentWeekSessions.length)
+    }
 
-  const progressGroupExample3 = [
-    { title: 'Organic Search', icon: cibGoogle, percent: 56, value: '191,235' },
-    { title: 'Facebook', icon: cibFacebook, percent: 15, value: '51,223' },
-    { title: 'Twitter', icon: cibTwitter, percent: 11, value: '37,564' },
-    { title: 'LinkedIn', icon: cibLinkedin, percent: 8, value: '27,319' },
-  ]
+    fetchSessionsAndStudents()
+  }, [])
 
-  const tableExample = [
-    {
-      avatar: { src: avatar1, status: 'success' },
-      user: {
-        name: 'Yiorgos Avraamu',
-        new: true,
-        registered: 'Jan 1, 2023',
-      },
-      country: { name: 'USA', flag: cifUs },
-      usage: {
-        value: 50,
-        period: 'Jun 11, 2023 - Jul 10, 2023',
-        color: 'success',
-      },
-      payment: { name: 'Mastercard', icon: cibCcMastercard },
-      activity: '10 sec ago',
-    },
-    {
-      avatar: { src: avatar2, status: 'danger' },
-      user: {
-        name: 'Avram Tarasios',
-        new: false,
-        registered: 'Jan 1, 2023',
-      },
-      country: { name: 'Brazil', flag: cifBr },
-      usage: {
-        value: 22,
-        period: 'Jun 11, 2023 - Jul 10, 2023',
-        color: 'info',
-      },
-      payment: { name: 'Visa', icon: cibCcVisa },
-      activity: '5 minutes ago',
-    },
-    {
-      avatar: { src: avatar3, status: 'warning' },
-      user: { name: 'Quintin Ed', new: true, registered: 'Jan 1, 2023' },
-      country: { name: 'India', flag: cifIn },
-      usage: {
-        value: 74,
-        period: 'Jun 11, 2023 - Jul 10, 2023',
-        color: 'warning',
-      },
-      payment: { name: 'Stripe', icon: cibCcStripe },
-      activity: '1 hour ago',
-    },
-    {
-      avatar: { src: avatar4, status: 'secondary' },
-      user: { name: 'Enéas Kwadwo', new: true, registered: 'Jan 1, 2023' },
-      country: { name: 'France', flag: cifFr },
-      usage: {
-        value: 98,
-        period: 'Jun 11, 2023 - Jul 10, 2023',
-        color: 'danger',
-      },
-      payment: { name: 'PayPal', icon: cibCcPaypal },
-      activity: 'Last month',
-    },
-    {
-      avatar: { src: avatar5, status: 'success' },
-      user: {
-        name: 'Agapetus Tadeáš',
-        new: true,
-        registered: 'Jan 1, 2023',
-      },
-      country: { name: 'Spain', flag: cifEs },
-      usage: {
-        value: 22,
-        period: 'Jun 11, 2023 - Jul 10, 2023',
-        color: 'primary',
-      },
-      payment: { name: 'Google Wallet', icon: cibCcApplePay },
-      activity: 'Last week',
-    },
-    {
-      avatar: { src: avatar6, status: 'danger' },
-      user: {
-        name: 'Friderik Dávid',
-        new: true,
-        registered: 'Jan 1, 2023',
-      },
-      country: { name: 'Poland', flag: cifPl },
-      usage: {
-        value: 43,
-        period: 'Jun 11, 2023 - Jul 10, 2023',
-        color: 'success',
-      },
-      payment: { name: 'Amex', icon: cibCcAmex },
-      activity: 'Last week',
-    },
-  ]
+  const filterCurrentWeekSessions = (sessions) => {
+    const now = new Date()
+    const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay() + 1))
+    const endOfWeek = new Date(now.setDate(now.getDate() - now.getDay() + 7))
+    return sessions.filter((session) => {
+      const sessionDate = new Date(session.dateSéance)
+      return sessionDate >= startOfWeek && sessionDate <= endOfWeek
+    })
+  }
+
+  const calculateAbsenceStats = (sessions, studentsData) => {
+    let totalStudents = 0
+    let totalAbsences = 0
+
+    sessions.forEach((session) => {
+      const sessionGroupId = session.groupeId
+      const studentsInGroup = studentsData.filter((student) => student.idGroupe === sessionGroupId)
+      const absences = session.étudiantsAbsents.length
+      totalStudents += studentsInGroup.length
+      totalAbsences += absences
+    })
+
+    return { totalStudents, totalAbsences }
+  }
+  const progressColors = ['primary', 'secondary', 'success', 'danger', 'warning', 'info']
+
+  const getInitials = (fullName) => {
+    const nameParts = fullName.split(' ')
+    const firstNameInitial = nameParts[0]?.charAt(0).toUpperCase() || ''
+    const lastNameInitial = nameParts[1]?.charAt(0).toUpperCase() || ''
+    return `${firstNameInitial}${lastNameInitial}`
+  }
+
+  const getColor = (name) => {
+    const scale = chroma.scale(['#fafa6e', '#2A4858']).mode('lch').colors(10)
+    const hash = Array.from(name).reduce((acc, char) => char.charCodeAt(0) + acc, 0)
+    return scale[hash % scale.length]
+  }
+  const getTimeAgoString = (lastLoginDate) => {
+    const now = new Date()
+    const loginDate = new Date(lastLoginDate)
+    const diffMilliseconds = now - loginDate
+
+    const seconds = Math.floor(diffMilliseconds / 1000)
+    if (seconds < 5 * 60) {
+      return '5 seconds ago'
+    } else if (seconds < 60 * 60) {
+      const minutes = Math.floor(seconds / 60)
+      return `${minutes} minute${minutes > 1 ? 's' : ''} ago`
+    } else if (seconds < 24 * 60 * 60) {
+      const hours = Math.floor(seconds / (60 * 60))
+      return `${hours} hour${hours > 1 ? 's' : ''} ago`
+    } else if (now.getFullYear() === loginDate.getFullYear()) {
+      return loginDate.toLocaleDateString()
+    } else {
+      return loginDate.toLocaleDateString()
+    }
+  }
 
   return (
     <>
-      <WidgetsDropdown className="mb-4" />
+      <CRow xs={{ gutter: 4 }}>
+        <FilièreWidget getFilieres={getFilières} />
+        <UsersWidget getStudents={getStudents} getUsers={getUsers} />
+      </CRow>
+      <CRow xs={{ gutter: 4 }}>
+        <SalaryWidget getFacture={getAllFactures} />
+        <GroupeWidget getGroupes={getGroupes} getFilieres={getFilières} />
+      </CRow>
       <CCard className="mb-4"></CCard>
       <CRow>
         <CCol xs>
@@ -186,84 +176,46 @@ const Dashboard = () => {
             <CCardHeader>Traffic {' & '} Sales</CCardHeader>
             <CCardBody>
               <CRow>
-                <CCol xs={12} md={6} xl={6}>
+                <CCol xs={12} md={6} xl={12}>
                   <CRow>
-                    <CCol xs={6}>
-                      <div className="border-start border-start-4 border-start-info py-1 px-3">
-                        <div className="text-body-secondary text-truncate small">New Clients</div>
-                        <div className="fs-5 fw-semibold">9,123</div>
+                    <CCol sm>
+                      <div className="border-start border-start-4 border-start-info py-1 px-3 mb-3">
+                        <div className="text-body-secondary text-truncate small">Proffesseur</div>
+                        <div className="fs-5 fw-semibold">{enseignantCount}</div>
                       </div>
                     </CCol>
-                    <CCol xs={6}>
+                    <CCol sm>
                       <div className="border-start border-start-4 border-start-danger py-1 px-3 mb-3">
                         <div className="text-body-secondary text-truncate small">
-                          Recurring Clients
+                          Module enseignés
                         </div>
-                        <div className="fs-5 fw-semibold">22,643</div>
+                        <div className="fs-5 fw-semibold">{modulesCount}</div>
                       </div>
                     </CCol>
-                  </CRow>
-                  <hr className="mt-0" />
-                  {progressGroupExample1.map((item, index) => (
-                    <div className="progress-group mb-4" key={index}>
-                      <div className="progress-group-prepend">
-                        <span className="text-body-secondary small">{item.title}</span>
-                      </div>
-                      <div className="progress-group-bars">
-                        <CProgress thin color="info" value={item.value1} />
-                        <CProgress thin color="danger" value={item.value2} />
-                      </div>
-                    </div>
-                  ))}
-                </CCol>
-                <CCol xs={12} md={6} xl={6}>
-                  <CRow>
-                    <CCol xs={6}>
-                      <div className="border-start border-start-4 border-start-warning py-1 px-3 mb-3">
-                        <div className="text-body-secondary text-truncate small">Pageviews</div>
-                        <div className="fs-5 fw-semibold">78,623</div>
-                      </div>
-                    </CCol>
-                    <CCol xs={6}>
+                    <CCol sm>
                       <div className="border-start border-start-4 border-start-success py-1 px-3 mb-3">
-                        <div className="text-body-secondary text-truncate small">Organic</div>
-                        <div className="fs-5 fw-semibold">49,123</div>
+                        <div className="text-body-secondary text-truncate small">
+                          Séances effectuées (semaine actuelle)
+                        </div>
+                        <div className="fs-5 fw-semibold">{sessionsCount}</div>
+                      </div>
+                    </CCol>
+                    <CCol sm>
+                      <div className="border-start border-start-4 border-start-warning py-1 px-3 mb-3">
+                        <div className="text-body-secondary text-truncate small">
+                          Pourcentage d'absence (semaine actuelle)
+                        </div>
+                        <div className="fs-5 fw-semibold">{absencePercentage} %</div>
                       </div>
                     </CCol>
                   </CRow>
-
                   <hr className="mt-0" />
-
-                  {progressGroupExample2.map((item, index) => (
-                    <div className="progress-group mb-4" key={index}>
-                      <div className="progress-group-header">
-                        <CIcon className="me-2" icon={item.icon} size="lg" />
-                        <span>{item.title}</span>
-                        <span className="ms-auto fw-semibold">{item.value}%</span>
-                      </div>
-                      <div className="progress-group-bars">
-                        <CProgress thin color="warning" value={item.value} />
-                      </div>
-                    </div>
-                  ))}
-
-                  <div className="mb-5"></div>
-
-                  {progressGroupExample3.map((item, index) => (
-                    <div className="progress-group" key={index}>
-                      <div className="progress-group-header">
-                        <CIcon className="me-2" icon={item.icon} size="lg" />
-                        <span>{item.title}</span>
-                        <span className="ms-auto fw-semibold">
-                          {item.value}{' '}
-                          <span className="text-body-secondary small">({item.percent}%)</span>
-                        </span>
-                      </div>
-                      <div className="progress-group-bars">
-                        <CProgress thin color="success" value={item.percent} />
-                      </div>
-                    </div>
-                  ))}
+                  <CRow>
+                    <ProfessorDetailsWidget
+                      getseance={getAllSessions}
+                      getStudentData={getStudents}
+                    />
+                  </CRow>
                 </CCol>
               </CRow>
 
@@ -275,48 +227,63 @@ const Dashboard = () => {
                     <CTableHeaderCell className="bg-body-tertiary text-center">
                       <CIcon icon={cilPeople} />
                     </CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary">User</CTableHeaderCell>
+                    <CTableHeaderCell className="bg-body-tertiary">Utilisateur</CTableHeaderCell>
                     <CTableHeaderCell className="bg-body-tertiary text-center">
-                      Country
+                      Pays
                     </CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary">Usage</CTableHeaderCell>
+                    <CTableHeaderCell className="bg-body-tertiary">Utilisation</CTableHeaderCell>
                     <CTableHeaderCell className="bg-body-tertiary text-center">
-                      Payment Method
+                      Mode de paiement
                     </CTableHeaderCell>
-                    <CTableHeaderCell className="bg-body-tertiary">Activity</CTableHeaderCell>
+                    <CTableHeaderCell className="bg-body-tertiary">Activité</CTableHeaderCell>
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
-                  {tableExample.map((item, index) => (
+                  {users.map((user, index) => (
                     <CTableRow v-for="item in tableItems" key={index}>
                       <CTableDataCell className="text-center">
-                        <CAvatar size="md" src={item.avatar.src} status={item.avatar.status} />
+                        <CAvatar
+                          status={user.isOnline ? 'success' : 'danger'}
+                          style={{ backgroundColor: getColor(user.fullName) }}
+                        >
+                          {getInitials(user.fullName)}
+                        </CAvatar>
                       </CTableDataCell>
                       <CTableDataCell>
-                        <div>{item.user.name}</div>
+                        <div>{user.fullName}</div>
                         <div className="small text-body-secondary text-nowrap">
-                          <span>{item.user.new ? 'New' : 'Recurring'}</span> | Registered:{' '}
-                          {item.user.registered}
+                          <span>{user.roleName}</span> | Créer:{' '}
+                          {new Date(user.accountCreationDate).toLocaleDateString()}
                         </div>
                       </CTableDataCell>
                       <CTableDataCell className="text-center">
-                        <CIcon size="xl" icon={item.country.flag} title={item.country.name} />
+                        <CIcon size="xl" icon={cifMa} />
                       </CTableDataCell>
                       <CTableDataCell>
                         <div className="d-flex justify-content-between text-nowrap">
-                          <div className="fw-semibold">{item.usage.value}%</div>
+                          <div className="fw-semibold">
+                            {user.usagePercentage ? Math.floor(user.usagePercentage) : 0}%
+                          </div>
                           <div className="ms-3">
-                            <small className="text-body-secondary">{item.usage.period}</small>
+                            <small className="text-body-secondary">{}</small>
                           </div>
                         </div>
-                        <CProgress thin color={item.usage.color} value={item.usage.value} />
+                        <CProgress
+                          thin
+                          color={progressColors[index]}
+                          value={user.usagePercentage}
+                        />
                       </CTableDataCell>
                       <CTableDataCell className="text-center">
-                        <CIcon size="xl" icon={item.payment.icon} />
+                        <CIcon size="xl" icon={cibCcVisa} />
                       </CTableDataCell>
                       <CTableDataCell>
-                        <div className="small text-body-secondary text-nowrap">Last login</div>
-                        <div className="fw-semibold text-nowrap">{item.activity}</div>
+                        <div className="small text-body-secondary text-nowrap">
+                          Dernière connexion
+                        </div>
+                        <div className="fw-semibold text-nowrap">
+                          {new Date(user.lastLoginDate).toLocaleDateString()}
+                        </div>
                       </CTableDataCell>
                     </CTableRow>
                   ))}

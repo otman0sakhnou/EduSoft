@@ -4,7 +4,15 @@ import TextField from '@mui/material/TextField'
 import 'react-confirm-alert/src/react-confirm-alert.css'
 import { createFiliere } from '../../Actions/BackOfficeActions/FilièreActions'
 import { toast } from 'react-hot-toast'
-import { CButton, CModal, CModalHeader, CModalTitle, CModalBody, CModalFooter } from '@coreui/react'
+import {
+  CButton,
+  CModal,
+  CModalHeader,
+  CModalTitle,
+  CModalBody,
+  CModalFooter,
+  CSpinner,
+} from '@coreui/react'
 import { useAuth } from 'react-oidc-context'
 
 export default function AddFiliereDialog({ fetchFilières }) {
@@ -13,6 +21,7 @@ export default function AddFiliereDialog({ fetchFilières }) {
   const [description, setDescription] = useState('')
   const [nomFiliereError, setNomFiliereError] = useState(false)
   const [descriptionError, setDescriptionError] = useState(false)
+  const [loading, setLoading] = useState(false)
   const auth = useAuth()
   const accessToken = auth?.user?.access_token
 
@@ -37,10 +46,12 @@ export default function AddFiliereDialog({ fetchFilières }) {
     if (hasError) return
 
     try {
-      setOpen(false)
+      setLoading(true)
       await createFiliere({ NomFilière, description }, accessToken)
       fetchFilières()
       toast.success('Filière ajouté avec succès')
+      setLoading(false)
+      setOpen(false)
     } catch (error) {
       console.error('Error creating filiere:', error)
       toast.error("Erreur lors de l'ajout")
@@ -143,8 +154,13 @@ export default function AddFiliereDialog({ fetchFilières }) {
               backgroundColor: '#007bff',
               cursor: 'pointer',
             }}
+            disabled={loading}
           >
-            Enregistrer
+            {loading ? (
+              <CSpinner as="span" size="sm" variant="grow" aria-hidden="true" />
+            ) : (
+              'Enregistrer'
+            )}
           </CButton>
           <CButton
             onClick={handleClose}
@@ -170,5 +186,5 @@ export default function AddFiliereDialog({ fetchFilières }) {
   )
 }
 AddFiliereDialog.propTypes = {
-  fetchFilières: PropTypes.func.isRequired, // Ensure fetchGroupe is a function and is required
+  fetchFilières: PropTypes.func.isRequired,
 }

@@ -23,11 +23,9 @@ const AppHeader = () => {
   const [userName, setUserName] = useState('')
 
   useEffect(() => {
-    // Check if user information is available
     if (auth.user) {
       setUserName(auth.user.profile.name)
     } else {
-      // If not available, try to retrieve from storage
       const storedUser = sessionStorage.getItem('user')
       if (storedUser) {
         setUserName(JSON.parse(storedUser).profile.name)

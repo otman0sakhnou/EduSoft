@@ -11,4 +11,11 @@ public class ApplicationUser : IdentityUser
 {
   public string roleName { get; set; }
   public string FullName { get; internal set; }
+  public DateTime AccountCreationDate { get; set; } = DateTime.UtcNow;
+  public DateTime? LastLoginDate { get; set; }
+  public DateTime? LastLogoutDate { get; set; }
+  public bool IsOnline { get; set; }
+  public double UsagePercentage { get; set; }
+  public TimeSpan TotalTimeSpent { get; set; }
+  public TimeSpan TimeSpentSinceLastLogin { get; set; }
 }

@@ -115,7 +115,7 @@ export default function Filière() {
                       Les filières disponibles
                     </h2>
                     <div className="col-lg-8 ml-auto">
-                      <CFormInput
+                      <TextField
                         type="text"
                         placeholder="Rechercher par le nom de filière..."
                         className="form-control"

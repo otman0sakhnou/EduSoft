@@ -101,6 +101,13 @@ namespace IdentityService.Pages.Login
                 if (result.Succeeded)
                 {
                     var user = await _userManager.FindByNameAsync(Input.UserName!);
+                    if (user != null)
+                    {
+                        user.LastLoginDate = DateTime.UtcNow;
+                        user.IsOnline = true;
+                        await _userManager.UpdateAsync(user);
+                    }
+
                     await _events.RaiseAsync(new UserLoginSuccessEvent(user!.Email, user.Id, user.UserName, clientId: context?.Client.ClientId));
                     Telemetry.Metrics.UserLogin(context?.Client.ClientId, IdentityServerConstants.LocalIdentityProvider);
 

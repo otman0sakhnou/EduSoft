@@ -23,6 +23,7 @@ import {
   CCardSubtitle,
   CPagination,
   CPaginationItem,
+  CSpinner,
 } from '@coreui/react'
 import { getStudents } from '../../Actions/BackOfficeActions/ÉtudiantActions'
 import { getGroupes } from '../../Actions/BackOfficeActions/GroupeActions'
@@ -171,6 +172,7 @@ export default function ÉtudiantParGroupe() {
           validationErrors.push(
             `Le téléphone doit être valide pour l'étudiant ${student.nom} ${student.prenom}.`,
           )
+          console.log(student.telephone)
           continue
         }
 
@@ -215,6 +217,7 @@ export default function ÉtudiantParGroupe() {
           })
         }
         setLoading(false)
+        setConfirmImportModalVisible(false)
         toast.success('Les étudiants ont été importés avec succès.')
         fetchStudents()
       } catch (error) {
@@ -544,10 +547,10 @@ export default function ÉtudiantParGroupe() {
             }}
             onClick={() => {
               handleUpload()
-              setConfirmImportModalVisible(false)
             }}
+            disabled={loading}
           >
-            Oui
+            {loading ? <CSpinner as="span" size="sm" variant="grow" aria-hidden="true" /> : 'Oui'}
           </CButton>
           <CButton
             shape="rounded-pill"

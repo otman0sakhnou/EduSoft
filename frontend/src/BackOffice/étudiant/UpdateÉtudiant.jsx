@@ -1,7 +1,15 @@
 /* eslint-disable react/no-unescaped-entities */
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { CButton, CModal, CModalHeader, CModalTitle, CModalBody, CModalFooter } from '@coreui/react'
+import {
+  CButton,
+  CModal,
+  CModalHeader,
+  CModalTitle,
+  CModalBody,
+  CModalFooter,
+  CSpinner,
+} from '@coreui/react'
 import { TextField, MenuItem, Select, Fab } from '@mui/material/'
 import EditRoundedIcon from '@mui/icons-material/EditRounded'
 import { updateStudent } from '../../Actions/BackOfficeActions/ÉtudiantActions'
@@ -10,6 +18,7 @@ import { getGroupes } from '../../Actions/BackOfficeActions/GroupeActions'
 
 export default function UpdateÉtudiant({ student, fetchStudents }) {
   const [open, setOpen] = useState(false)
+  const [loading, setLoading] = useState(false)
   const [nom, setNom] = useState(student.nom)
   const [prenom, setPrenom] = useState(student.prenom)
   const [adresse, setAdresse] = useState(student.adresse)
@@ -99,6 +108,7 @@ export default function UpdateÉtudiant({ student, fetchStudents }) {
       ? new Date(dateNaissance).toISOString().split('T')[0]
       : null
     try {
+      setLoading(true)
       await updateStudent(student.etudiantId, {
         cne: cne,
         cin: cin,
@@ -112,6 +122,7 @@ export default function UpdateÉtudiant({ student, fetchStudents }) {
         idGroupe: IdGroupe,
       })
       fetchStudents()
+      setLoading(false)
       setOpen(false)
       toast.success('étudiant modifé avec succès')
     } catch (error) {
@@ -315,8 +326,13 @@ export default function UpdateÉtudiant({ student, fetchStudents }) {
               backgroundColor: '#007bff',
               cursor: 'pointer',
             }}
+            disabled={loading}
           >
-            Enregistrer
+            {loading ? (
+              <CSpinner as="span" size="sm" variant="grow" aria-hidden="true" />
+            ) : (
+              'Modifier'
+            )}
           </CButton>
           <CButton
             onClick={handleClose}

@@ -44,11 +44,22 @@ public class FactureController : ControllerBase
   {
     try
     {
-      TimeSpan totalDuration;
-      if (TimeSpan.TryParseExact(reqFacture.TotalHeures, "hh\\:mm", CultureInfo.InvariantCulture, out totalDuration))
+      int totalHours;
+      int totalMinutes;
+
+      // Split the total hours string into hours and minutes
+      string[] parts = reqFacture.TotalHeures.Split(':');
+
+      if (parts.Length == 2 && int.TryParse(parts[0], out totalHours) && int.TryParse(parts[1], out totalMinutes))
       {
-        double totalHours = totalDuration.TotalHours;
-        decimal totalAmount = (decimal)totalHours * reqFacture.MontantParHeure;
+        // Calculate the total duration in minutes
+        int totalDurationInMinutes = totalHours * 60 + totalMinutes;
+
+        // Calculate the total duration in hours
+        double totalDurationInHours = (double)totalDurationInMinutes / 60;
+
+        // Calculate the total amount
+        decimal totalAmount = (decimal)totalDurationInHours * reqFacture.MontantParHeure;
 
         var facture = new Facture
         {
@@ -57,7 +68,7 @@ public class FactureController : ControllerBase
           Année = reqFacture.Année,
           MontantParHeure = reqFacture.MontantParHeure,
           TotalHeures = reqFacture.TotalHeures,
-          MontantTotale =(double) totalAmount 
+          MontantTotale = (double)totalAmount
         };
 
         _backOfficeDbContext.Factures.Add(facture);

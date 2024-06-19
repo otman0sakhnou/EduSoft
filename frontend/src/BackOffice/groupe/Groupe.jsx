@@ -103,7 +103,6 @@ export default function Groupe() {
               <div className="col-lg-12 mb-3">
                 <CCardHeader
                   style={{
-                    backgroundColor: '#e9ecef',
                     padding: '0.75rem 1.25rem',
                     borderBottom: '1px solid #dee2e6',
                     borderRadius: '12px 12px 0 0',
@@ -113,7 +112,6 @@ export default function Groupe() {
                     <h2
                       style={{
                         fontWeight: 'bold',
-                        color: '#343a40',
                       }}
                       className="mb-2 mx-3"
                     >

@@ -83,7 +83,7 @@ function UserList() {
               onChange={handleSearch}
               style={{ maxWidth: '100%' }}
               InputProps={{
-                endAdornment: <CIcon content={cilSearch} />,
+                startAdornment: <CIcon content={cilSearch} />,
               }}
             />
           </div>
@@ -103,7 +103,7 @@ function UserList() {
                 <CCardBody>
                   <Stack direction="row" spacing={2} alignItems="center">
                     <Avatar sx={{ bgcolor: stringToColor(user.userName) }}>
-                      {user.userName.charAt(0)}
+                      {user.userName.charAt(0).toUpperCase()}
                     </Avatar>
                     <div>
                       <Typography variant="h6" style={{ fontWeight: 'bold' }}>

@@ -214,7 +214,6 @@ export default function Facture() {
                     <h2
                       style={{
                         fontWeight: 'bold',
-                        color: '#343a40',
                       }}
                       className="mb-2 mx-3"
                     >

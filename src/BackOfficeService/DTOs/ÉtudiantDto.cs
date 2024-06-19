@@ -12,6 +12,7 @@ public class ÉtudiantDto
   public string Email { get; set; }
   public DateOnly? DateDeNaissance { get; set; }
   public string LieuDeNaissance { get; set; }
+  public string IdGroupe { get; set; }
   public string NomGroupe { get; set; }
 
 }

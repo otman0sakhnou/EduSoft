@@ -22,7 +22,7 @@ public class Index : PageModel
     private readonly IIdentityServerInteractionService _interaction;
     private readonly IEventService _events;
 
-    [BindProperty] 
+    [BindProperty]
     public string? LogoutId { get; set; }
 
     public Index(SignInManager<ApplicationUser> signInManager, IIdentityServerInteractionService interaction, IEventService events)
@@ -52,7 +52,7 @@ public class Index : PageModel
                 showLogoutPrompt = false;
             }
         }
-            
+
         if (showLogoutPrompt == false)
         {
             // if the request for logout was properly authenticated from IdentityServer, then
@@ -67,11 +67,45 @@ public class Index : PageModel
     {
         if (User.Identity?.IsAuthenticated == true)
         {
+            LogoutId ??= await _interaction.CreateLogoutContextAsync();
+            var user = await _signInManager.UserManager.GetUserAsync(User);
+
+            if (user != null)
+            {
+                // Ensure LastLoginDate is set
+                if (user.LastLoginDate == null)
+                {
+                    user.LastLoginDate = DateTime.UtcNow;
+                }
+
+                // Calculate time spent since last login
+                user.TimeSpentSinceLastLogin = DateTime.UtcNow - user.LastLoginDate.Value;
+
+                // Accumulate total time spent
+                user.TotalTimeSpent += user.TimeSpentSinceLastLogin;
+
+                // Calculate total seconds since account creation
+                double totalSecondsSinceAccountCreation = (DateTime.UtcNow - user.AccountCreationDate).TotalSeconds;
+
+                // Calculate usage percentage
+                user.UsagePercentage = totalSecondsSinceAccountCreation > 0
+                    ? (user.TotalTimeSpent.TotalSeconds / totalSecondsSinceAccountCreation) * 100
+                    : 0;
+
+                // Update LastLogoutDate
+                user.LastLogoutDate = DateTime.UtcNow;
+
+                // Save changes to the user
+                var updateResult = await _signInManager.UserManager.UpdateAsync(user);
+                if (!updateResult.Succeeded)
+                {
+                    // Handle update failure (logging, throw exception, etc.)
+                }
+            }
             // if there's no current logout context, we need to create one
             // this captures necessary info from the current logged in user
             // this can still return null if there is no context needed
-            LogoutId ??= await _interaction.CreateLogoutContextAsync();
-                
+
             // delete local authentication cookie
             await _signInManager.SignOutAsync();
 

@@ -6,7 +6,15 @@ import Select from 'react-select'
 import { updateModule } from '../../Actions/BackOfficeActions/ModuleActions'
 import { getFilières } from '../../Actions/BackOfficeActions/FilièreActions'
 import { toast } from 'react-hot-toast'
-import { CButton, CModal, CModalHeader, CModalTitle, CModalBody, CModalFooter } from '@coreui/react'
+import {
+  CButton,
+  CModal,
+  CModalHeader,
+  CModalTitle,
+  CModalBody,
+  CModalFooter,
+  CSpinner,
+} from '@coreui/react'
 import EditRounded from '@mui/icons-material/EditRounded'
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline'
 
@@ -19,6 +27,7 @@ export default function UpdateModule({ module, fetchModules }) {
   const [moduleNameError, setModuleNameError] = useState(false)
   const [filièreError, setFilièreError] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     fetchFilières()
@@ -70,11 +79,13 @@ export default function UpdateModule({ module, fetchModules }) {
     setIsLoading(true)
 
     try {
+      setLoading(true)
       await updateModule(module.moduleId, {
         nomModule: moduleName,
         FilièreIds: selectedFilières.map((filière) => filière.value),
       })
       fetchModules()
+      setLoading(false)
       setOpen(false)
       toast.success('Module mis à jour avec succès')
     } catch (error) {
@@ -153,8 +164,13 @@ export default function UpdateModule({ module, fetchModules }) {
               backgroundColor: '#007bff',
               cursor: 'pointer',
             }}
+            disabled={loading}
           >
-            Enregistrer
+            {loading ? (
+              <CSpinner as="span" size="sm" variant="grow" aria-hidden="true" />
+            ) : (
+              'Modifier'
+            )}
           </CButton>
           <CButton
             onClick={handleClose}

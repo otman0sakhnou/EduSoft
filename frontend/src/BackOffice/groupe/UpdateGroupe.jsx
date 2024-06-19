@@ -9,7 +9,15 @@ import 'react-confirm-alert/src/react-confirm-alert.css'
 import { updateGroupe } from '../../Actions/BackOfficeActions/GroupeActions'
 import { getFilières } from '../../Actions/BackOfficeActions/FilièreActions'
 import { toast } from 'react-hot-toast'
-import { CButton, CModal, CModalHeader, CModalTitle, CModalBody, CModalFooter } from '@coreui/react'
+import {
+  CButton,
+  CModal,
+  CModalHeader,
+  CModalTitle,
+  CModalBody,
+  CModalFooter,
+  CSpinner,
+} from '@coreui/react'
 import EditRounded from '@mui/icons-material/EditRounded'
 
 export default function UpdateGroupeDialog({ groupe, fetchGroupe }) {
@@ -19,6 +27,7 @@ export default function UpdateGroupeDialog({ groupe, fetchGroupe }) {
   const [filières, setFilières] = useState([])
   const [groupeNameError, setGroupeNameError] = useState(false)
   const [filièreError, setFilièreError] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     fetchFilières()
@@ -55,8 +64,10 @@ export default function UpdateGroupeDialog({ groupe, fetchGroupe }) {
     if (hasError) return
 
     try {
+      setLoading(true)
       await updateGroupe(groupe.groupeID, { nomGroupe: groupeName, idFilière: filièreId })
       fetchGroupe()
+      setLoading(false)
       setOpen(false)
       toast.success('Groupe mis à jour avec succès')
     } catch (error) {
@@ -137,8 +148,13 @@ export default function UpdateGroupeDialog({ groupe, fetchGroupe }) {
               backgroundColor: '#007bff',
               cursor: 'pointer',
             }}
+            disabled={loading}
           >
-            Modifier
+            {loading ? (
+              <CSpinner as="span" size="sm" variant="grow" aria-hidden="true" />
+            ) : (
+              'Modifier'
+            )}
           </CButton>
           <CButton
             onClick={handleClose}

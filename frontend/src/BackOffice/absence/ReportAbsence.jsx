@@ -15,6 +15,7 @@ import {
   CModalTitle,
   CModalBody,
   CModalFooter,
+  CSpinner,
 } from '@coreui/react'
 import { addSession } from '../../Actions/BackOfficeActions/SéanceActions'
 import { getGroupes } from '../../Actions/BackOfficeActions/GroupeActions'
@@ -43,6 +44,7 @@ export default function Component() {
   const [selectedModuleError, setSelectedModuleError] = useState('')
   const [selectedFiliere, setSelectedFiliere] = useState('')
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
+  const [loading, setLoading] = useState(false)
   const auth = useAuth()
   const accessToken = auth?.user?.access_token
   const resetForm = () => {
@@ -140,6 +142,7 @@ export default function Component() {
   }
   const confirmSignaler = async () => {
     try {
+      setLoading(true)
       await addSession(
         {
           GroupeId: selectedGroupId,
@@ -154,6 +157,7 @@ export default function Component() {
         setAbsentStudents([])
       toast.success("Signalement d'absence avec succèss")
       resetForm()
+      setLoading(false)
       setShowConfirmationModal(false)
     } catch (error) {
       console.error('Error signaling absence or adding session:', error)
@@ -168,7 +172,6 @@ export default function Component() {
         style={{
           maxWidth: '100%',
           borderRadius: '12px',
-          backgroundColor: '#f8f9fa',
           transition: 'transform 0.3s',
         }}
         onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-5px)')}
@@ -180,8 +183,6 @@ export default function Component() {
             style={{
               fontSize: '1.25rem',
               fontWeight: 'bold',
-              color: '#343a40',
-              backgroundColor: '#e9ecef',
               padding: '0.75rem 1.25rem',
               borderBottom: '1px solid #dee2e6',
               borderRadius: '12px 12px 0 0',
@@ -202,6 +203,7 @@ export default function Component() {
                     value={selectedGroup}
                     displayEmpty
                     fullWidth
+                    isSearchable={true}
                     error={selectedGroupError}
                     helperText={selectedGroupError && 'Vous devez sélectionner un groupe'}
                     placeholder="Sélectionner le groupe"
@@ -420,9 +422,14 @@ export default function Component() {
               backgroundColor: '#007bff',
               cursor: 'pointer',
             }}
+            disabled={loading}
             onClick={confirmSignaler}
           >
-            Oui
+            {loading ? (
+              <CSpinner as="span" size="sm" variant="grow" aria-hidden="true" />
+            ) : (
+              'Signaler'
+            )}
           </CButton>
           <CButton
             shape="rounded-pill"

@@ -7,7 +7,7 @@ import {
   CModalTitle,
   CModalBody,
   CModalFooter,
-  CFormSelect,
+  CSpinner,
 } from '@coreui/react'
 import { TextField, MenuItem, Select } from '@mui/material/'
 import { getGroupes } from '../../Actions/BackOfficeActions/GroupeActions'
@@ -15,6 +15,7 @@ import { createStudent } from '../../Actions/BackOfficeActions/ÉtudiantActions'
 import { toast } from 'react-hot-toast'
 
 export default function AddÉtudiant({ fetchStudents }) {
+  const [loading, setLoading] = useState(false)
   const [open, setOpen] = useState(false)
   const [nom, setNom] = useState('')
   const [nomError, setNomError] = useState('')
@@ -106,7 +107,7 @@ export default function AddÉtudiant({ fetchStudents }) {
       ? new Date(dateNaissance).toISOString().split('T')[0]
       : null
     try {
-      setOpen(false)
+      setLoading(true)
       await createStudent({
         cne: cne,
         cin: cin,
@@ -120,6 +121,8 @@ export default function AddÉtudiant({ fetchStudents }) {
         idGroupe: groupeId,
       })
       await fetchStudents()
+      setLoading(false)
+      setOpen(false)
       toast.success('Étudiant ajouté avec succès')
     } catch (error) {
       console.error('Error creating student:', error)
@@ -341,8 +344,13 @@ export default function AddÉtudiant({ fetchStudents }) {
               backgroundColor: '#007bff',
               cursor: 'pointer',
             }}
+            disabled={loading}
           >
-            Enregistrer
+            {loading ? (
+              <CSpinner as="span" size="sm" variant="grow" aria-hidden="true" />
+            ) : (
+              'Enregistrer'
+            )}
           </CButton>
           <CButton
             onClick={handleClose}
